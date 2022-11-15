@@ -5,6 +5,7 @@ services:
     user: postgres
     volumes:
       - ./contData:/var/lib/postgresql/data
+      - ./tests/:/app/tests
     environment:
       POSTGRES_PASSWORD: example
       PGDATA: /var/lib/postgresql/data/pgdata
