@@ -3,6 +3,10 @@ import { ApolloServer } from "apollo-server";
 import dataSource from "./utils/datasource";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./resolvers/userResolver";
+import { ActivityResolver } from "./resolvers/activityResolver";
+import { ActivityTypeResolver } from "./resolvers/activityTypeResolver";
+import { ContributionResolver } from "./resolvers/contributionResolver";
+import { GoodDealResolver } from "./resolvers/goodDealResolver";
 
 const port = 5050;
 
@@ -11,7 +15,13 @@ async function start(): Promise<void> {
     await dataSource.initialize();
 
     const schema = await buildSchema({
-      resolvers: [UserResolver],
+      resolvers: [
+        UserResolver,
+        ActivityResolver,
+        ActivityTypeResolver,
+        ContributionResolver,
+        GoodDealResolver,
+      ],
     });
     const server = new ApolloServer({ schema });
 
