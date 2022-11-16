@@ -1,5 +1,11 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { IContribution } from "../interfaces/entities/IContribution";
 import { User } from "./user";
 
@@ -15,7 +21,7 @@ export class Contribution implements IContribution {
   amount: number;
 
   @Field()
-  @Column()
+  @CreateDateColumn({ name: "createdAt" })
   createdAt: Date;
 
   @Field(() => User, { nullable: false })

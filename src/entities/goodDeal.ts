@@ -1,5 +1,11 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { IGoodDeal } from "../interfaces/entities/IGoodDeal";
 import { User } from "./user";
 
@@ -27,7 +33,7 @@ export class GoodDeal implements IGoodDeal {
   image: string;
 
   @Field()
-  @Column()
+  @CreateDateColumn({ name: "createdAt" })
   createdAt: Date;
 
   @Field(() => User, { nullable: false })
