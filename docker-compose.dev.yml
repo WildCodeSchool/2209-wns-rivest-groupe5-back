@@ -28,6 +28,8 @@ services:
     build: ./
     ports:
       - 5050:5050
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy

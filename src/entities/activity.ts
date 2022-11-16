@@ -1,5 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { IActivity } from "../interfaces/entities/IActivity";
 import { ActivityType } from "./activityType";
 import { User } from "./user";
@@ -28,7 +28,7 @@ export class Activity implements IActivity {
   description: string;
 
   @Field()
-  @Column()
+  @CreateDateColumn({ name: "createdAt" })
   createdAt: Date;
 
   @Field(() => ActivityType, { nullable: true })
