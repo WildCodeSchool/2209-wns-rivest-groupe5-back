@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('./partials/head'); %>
+  </head>
+  <body>
+    <main>
+      <h1>Bienvenue sur WildCarbon <%= lastname %> <%= firstname %> !</h1>
+      <p>
+        Vous venez de terminer votre inscription sur WildCarbon et nous sommes
+        heureux de vous compter parmis nous.
+      </p>
+      <p>
+        Vous pouvez dès à présent vous connecter avec vos identifiants sur notre
+        plateforme WildCarbon.
+      </p>
+      <a href="<%= url %>" target="_blank">Accueil de WildCarbon</a>
+    </main>
+    <%- include('./partials/footer'); %>
+  </body>
+</html>

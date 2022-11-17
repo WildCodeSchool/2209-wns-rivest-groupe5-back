@@ -1,10 +1,9 @@
 import nodemailer from "nodemailer";
 import ejs from "ejs";
 import htmlToText from "html-to-text";
-import { IEmailCreation } from "../../interfaces/services/emails/emailCreationInterface";
-import { IProvisionalUser } from "../../interfaces/models/user/provisionalUserInterface";
-import { IUser } from "../../interfaces/models/user/userInterface";
 import path from "path";
+import { IEmailCreation } from "../interfaces/services/IEmailCreation";
+import { IUser } from "../interfaces/entities/IUser";
 
 export default class Email implements IEmailCreation {
   to: string;
@@ -15,20 +14,13 @@ export default class Email implements IEmailCreation {
   message?: string;
   otherData: any;
 
-  constructor(
-    user: IUser | IProvisionalUser,
-    url: string,
-    message?: string,
-    otherData?: any
-  ) {
+  constructor(user: IUser, url: string, message?: string, otherData?: any) {
     this.to = user.email;
     this.firstname = user.firstname;
     this.lastname = user.lastname;
     this.url = url;
-    this.from = `Job Success <${
-      process.env.EMAIL_USERNAME ?? "no-reply@kit-rh.com"
-    }>`;
-    this.message = message; // todo in future : delete ton use HTML template with message in the template directly
+    this.from = `<wildcarbon.contact@gmail.com>`;
+    this.message = message;
     this.otherData = otherData;
   }
 
@@ -56,7 +48,7 @@ export default class Email implements IEmailCreation {
   async send(template: string, subject: string): Promise<void> {
     const pathToTemplate = path.join(
       __dirname,
-      "/../../views/pages/emails/",
+      "/../views/emails/",
       template + ".ejs"
     );
 
