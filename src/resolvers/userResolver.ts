@@ -5,6 +5,7 @@ import { User } from "../entities/user";
 import dataSource from "../utils/datasource";
 import Email from "../services/email";
 import { getFrontendBaseUrl } from "../utils/getBaseUrls";
+import hashSha256 from "../utils/hashSha256";
 
 @Resolver(User)
 export class UserResolver {
@@ -24,6 +25,7 @@ export class UserResolver {
       const userFromDB = await dataSource.manager.findOneByOrFail(User, {
         email,
       });
+
       if (process.env.JWT_SECRET_KEY === undefined) {
         throw new Error();
       }
@@ -49,16 +51,58 @@ export class UserResolver {
       email,
     });
 
-    const [resetToken, cryptedToken] = requestingUser.createPasswordResetToken;
+    const resetToken = requestingUser.createPasswordResetToken;
     const resetPasswordFrontUrl = `${getFrontendBaseUrl()}reset-password/${resetToken}`;
 
     requestingUser.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
-    requestingUser.passwordResetToken = cryptedToken;
+
+    requestingUser.passwordResetToken = hashSha256(resetToken);
+
     await dataSource.manager.save(requestingUser);
 
     await new Email(requestingUser, resetPasswordFrontUrl).sendPasswordReset();
 
     return true;
+  }
+
+  @Mutation(() => String)
+  async resetPassword(
+    @Arg("resetToken") resetToken: string,
+    @Arg("password") password: string
+  ): Promise<String> {
+    const passwordResetToken = hashSha256(resetToken);
+
+    const requestingUser = await dataSource.manager.findOneByOrFail(User, {
+      passwordResetToken,
+    });
+
+    if (
+      requestingUser.passwordResetExpires === undefined ||
+      password === undefined ||
+      password.trim() === "" ||
+      new Date() > requestingUser.passwordResetExpires
+    ) {
+      throw new Error(
+        "Permission denied to reset the user password. Please make a forgot password request again."
+      );
+    }
+
+    requestingUser.password = await argon2.hash(password);
+    requestingUser.passwordResetToken = "";
+    requestingUser.passwordResetExpires = new Date(0);
+
+    await dataSource.manager.save(requestingUser);
+
+    if (process.env.JWT_SECRET_KEY === undefined) {
+      throw new Error();
+    }
+
+    const token = jwt.sign(
+      { email: requestingUser.email },
+      process.env.JWT_SECRET_KEY
+    );
+
+    return token;
   }
 
   @Mutation(() => User)
@@ -75,7 +119,7 @@ export class UserResolver {
     newUser.password = await argon2.hash(password);
     const userFromDB = await dataSource.manager.save(User, newUser);
 
-    await new Email(userFromDB, "test").sendWelcome();
+    await new Email(userFromDB, getFrontendBaseUrl()).sendWelcome();
 
     return userFromDB;
   }

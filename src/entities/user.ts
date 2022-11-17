@@ -63,18 +63,15 @@ export class User implements IUser {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  passwordResetToken?: string;
+  passwordResetToken: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  passwordResetExpires?: Date;
+  passwordResetExpires: Date;
 
-  public get createPasswordResetToken(): string[] {
+  public get createPasswordResetToken(): string {
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const cryptedToken = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
-    return [resetToken, cryptedToken];
+
+    return resetToken;
   }
 }
