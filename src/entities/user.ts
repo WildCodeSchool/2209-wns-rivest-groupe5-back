@@ -10,6 +10,7 @@ import { IUser } from "../interfaces/entities/IUser";
 import { Activity } from "./activity";
 import { Contribution } from "./contribution";
 import { GoodDeal } from "./goodDeal";
+import crypto from "crypto";
 
 @ObjectType()
 @Entity()
@@ -59,4 +60,21 @@ export class User implements IUser {
     cascade: true,
   })
   contributions: Contribution[];
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  passwordResetToken?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  passwordResetExpires?: Date;
+
+  public get createPasswordResetToken(): string[] {
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const cryptedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    return [resetToken, cryptedToken];
+  }
 }

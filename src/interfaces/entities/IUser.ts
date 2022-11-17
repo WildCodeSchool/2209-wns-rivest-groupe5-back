@@ -6,4 +6,8 @@ export interface IUser {
   password: string;
   avatar?: string;
   createdAt: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+
+  createPasswordResetToken: string[];
 }

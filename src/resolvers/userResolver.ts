@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { User } from "../entities/user";
 import dataSource from "../utils/datasource";
 import Email from "../services/email";
+import { getFrontendBaseUrl } from "../utils/getBaseUrls";
 
 @Resolver(User)
 export class UserResolver {
@@ -40,6 +41,24 @@ export class UserResolver {
       console.log(err);
       throw new Error("Invalid Auth");
     }
+  }
+
+  @Mutation(() => Boolean)
+  async forgotPassword(@Arg("email") email: string): Promise<boolean> {
+    const requestingUser = await dataSource.manager.findOneByOrFail(User, {
+      email,
+    });
+
+    const [resetToken, cryptedToken] = requestingUser.createPasswordResetToken;
+    const resetPasswordFrontUrl = `${getFrontendBaseUrl()}reset-password/${resetToken}`;
+
+    requestingUser.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+    requestingUser.passwordResetToken = cryptedToken;
+    await dataSource.manager.save(requestingUser);
+
+    await new Email(requestingUser, resetPasswordFrontUrl).sendPasswordReset();
+
+    return true;
   }
 
   @Mutation(() => User)
