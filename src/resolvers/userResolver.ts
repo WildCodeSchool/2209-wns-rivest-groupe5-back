@@ -8,10 +8,9 @@ import Email from "../services/email";
 @Resolver(User)
 export class UserResolver {
   @Query(() => [User])
-  async getAllUsers(): Promise<User[]> {
-    const allUsers = await dataSource.getRepository(User).find();
-
-    return allUsers;
+  async getUserById(@Arg("userId") userId: number): Promise<User[]> {
+    const getUserdata = await dataSource.getRepository(User).findBy({ userId });
+    return getUserdata;
   }
 
   @Query(() => String)
