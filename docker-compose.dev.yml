@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: example
       PGDATA: /var/lib/postgresql/data/pgdata
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ['CMD-SHELL', 'pg_isready']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -51,8 +51,8 @@ services:
     healthcheck:
       test: 'curl --fail --request POST --header ''content-type: application/json'' --url ''http://localhost:5050'' --data ''{"query":"query { __typename }"}'' || exit 1'
       interval: 2s
-      timeout: 10s
-      retries: 5
+      timeout: 16s
+      retries: 8
       start_period: 2s
 
   mailhog:
