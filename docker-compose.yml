@@ -28,6 +28,8 @@ services:
     ports:
       - 5050:5050
     command: [sh, -cx, "npm run build && npm run start"]
+    volumes:
+      - ./src/views:/app/build/views
     env_file:
       - .env
     depends_on:

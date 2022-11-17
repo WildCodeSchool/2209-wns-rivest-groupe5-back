@@ -3,6 +3,7 @@ import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { User } from "../entities/user";
 import dataSource from "../utils/datasource";
+import Email from "../services/email";
 
 @Resolver(User)
 export class UserResolver {
@@ -54,7 +55,9 @@ export class UserResolver {
     newUser.lastname = lastname;
     newUser.password = await argon2.hash(password);
     const userFromDB = await dataSource.manager.save(User, newUser);
-    console.log(userFromDB);
+
+    await new Email(userFromDB, "test").sendWelcome();
+
     return userFromDB;
   }
 }
