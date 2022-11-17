@@ -1,14 +1,15 @@
-import "reflect-metadata";
-import { ApolloServer } from "apollo-server";
-import dataSource from "./utils/datasource";
-import * as dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-import { buildSchema } from "type-graphql";
-import { UserResolver } from "./resolvers/userResolver";
-import { ActivityResolver } from "./resolvers/activityResolver";
-import { ActivityTypeResolver } from "./resolvers/activityTypeResolver";
-import { ContributionResolver } from "./resolvers/contributionResolver";
-import { GoodDealResolver } from "./resolvers/goodDealResolver";
+import 'reflect-metadata';
+import {ApolloServer} from 'apollo-server';
+import dataSource from './utils/datasource';
+import * as dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import {buildSchema} from 'type-graphql';
+import {UserResolver} from './resolvers/userResolver';
+import {ActivityResolver} from './resolvers/activityResolver';
+import {ActivityTypeResolver} from './resolvers/activityTypeResolver';
+import {ContributionResolver} from './resolvers/contributionResolver';
+import {GoodDealResolver} from './resolvers/goodDealResolver';
+import {TokenResolver} from './resolvers/tokenResolver';
 
 dotenv.config();
 
@@ -20,14 +21,15 @@ async function start(): Promise<void> {
 
     const schema = await buildSchema({
       resolvers: [
+        TokenResolver,
         UserResolver,
         ActivityResolver,
         ActivityTypeResolver,
         ContributionResolver,
         GoodDealResolver,
       ],
-      authChecker: ({ context }) => {
-        console.log("context", context);
+      authChecker: ({context}) => {
+        console.log('context', context);
         if (context.email === undefined) {
           return false;
         } else {
@@ -38,6 +40,7 @@ async function start(): Promise<void> {
     const server = new ApolloServer({
       schema,
       context: ({ req }) => {
+        console.log(req.headers);
         if (
           req.headers.authorization === undefined ||
           process.env.JWT_SECRET_KEY === undefined
@@ -49,6 +52,7 @@ async function start(): Promise<void> {
 
             if (reqJWT.length > 0) {
               const user = jwt.verify(reqJWT, process.env.JWT_SECRET_KEY);
+              console.log(user);
               return user;
             } else {
               return {};
@@ -62,13 +66,13 @@ async function start(): Promise<void> {
     });
 
     try {
-      const { url }: { url: string } = await server.listen({ port });
+      const {url}: {url: string} = await server.listen({port});
       console.log(`🚀  Server ready at ${url}`);
     } catch (error) {
       console.log(error);
     }
   } catch (error) {
-    console.log("Error while launching the server");
+    console.log('Error while launching the server');
     console.log(error);
   }
 }
