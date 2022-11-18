@@ -10,6 +10,8 @@ import { ActivityTypeResolver } from "./resolvers/activityTypeResolver";
 import { ContributionResolver } from "./resolvers/contributionResolver";
 import { GoodDealResolver } from "./resolvers/goodDealResolver";
 import { TokenResolver } from "./resolvers/tokenResolver";
+import { IDecodedJWT } from "./interfaces/general/IDecodedJWT";
+import { User } from "./entities/user";
 
 dotenv.config();
 
@@ -31,18 +33,20 @@ async function start(): Promise<void> {
       authChecker: ({ context }, roles) => {
         // roles = roles in @Authorized decorators in resolvers
 
-        if (context.email === undefined) {
+        if (context.user.email === undefined) {
           return false;
-        } else if (roles.length === 0 || roles.includes(context.role)) {
+        } else if (roles.length === 0 || roles.includes(context.user.role)) {
+          console.log("User Role authorized");
           return true;
         } else {
+          console.log("User Role NOT authorized");
           return false;
         }
       },
     });
     const server = new ApolloServer({
       schema,
-      context: ({ req }) => {
+      context: async ({ req }) => {
         if (
           req.headers.authorization === undefined ||
           process.env.JWT_SECRET_KEY === undefined
@@ -53,9 +57,17 @@ async function start(): Promise<void> {
             const reqJWT = req.headers.authorization;
 
             if (reqJWT.length > 0) {
-              const user = jwt.verify(reqJWT, process.env.JWT_SECRET_KEY);
-              console.log(user);
-              return user;
+              const verifiedToken = jwt.verify(
+                reqJWT,
+                process.env.JWT_SECRET_KEY
+              );
+              const userToken = verifiedToken as IDecodedJWT;
+
+              const user = await dataSource
+                .getRepository(User)
+                .findOneByOrFail({ userId: userToken.userId });
+
+              return { user: user };
             } else {
               return {};
             }
