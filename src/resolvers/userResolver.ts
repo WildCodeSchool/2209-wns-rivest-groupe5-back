@@ -1,29 +1,41 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Field,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
+} from "type-graphql";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { User } from "../entities/user";
 import dataSource from "../utils/datasource";
 import Email from "../services/email";
-import { IUser } from "../interfaces/entities/IUser";
 
-interface IGetTokenResponse {
+@ObjectType()
+class LoginResponse {
+  @Field()
   token: string;
-  userFromDB: IUser;
+
+  @Field(() => User)
+  userFromDB: User;
 }
 
 @Resolver(User)
 export class UserResolver {
-  @Query(() => [User])
-  async getUserById(@Arg("userId") userId: number): Promise<User[]> {
-    const getUserdata = await dataSource.getRepository(User).findBy({ userId });
+  @Query(() => User)
+  async getUserById(@Arg("userId") userId: number): Promise<User> {
+    const getUserdata = await dataSource
+      .getRepository(User)
+      .findOneByOrFail({ userId });
     return getUserdata;
   }
 
-  @Query(() => Object)
+  @Query(() => LoginResponse)
   async getToken(
     @Arg("email") email: string,
     @Arg("password") password: string
-  ): Promise<IGetTokenResponse> {
+  ): Promise<LoginResponse> {
     try {
       const userFromDB = await dataSource.manager.findOneByOrFail(User, {
         email,
