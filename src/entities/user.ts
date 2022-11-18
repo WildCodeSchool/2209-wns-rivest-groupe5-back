@@ -11,6 +11,7 @@ import { Activity } from "./activity";
 import { Contribution } from "./contribution";
 import { GoodDeal } from "./goodDeal";
 import crypto from "crypto";
+import { USER_ROLES } from "../utils/userRoles";
 
 @ObjectType()
 @Entity()
@@ -68,6 +69,9 @@ export class User implements IUser {
   @Field({ nullable: true })
   @Column({ nullable: true })
   passwordResetExpires: Date;
+
+  @Column()
+  role: USER_ROLES;
 
   public get createPasswordResetToken(): string {
     const resetToken = crypto.randomBytes(32).toString("hex");

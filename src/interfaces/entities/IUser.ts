@@ -1,3 +1,5 @@
+import { USER_ROLES } from "../../utils/userRoles";
+
 export interface IUser {
   userId: number;
   firstname: string;
@@ -8,6 +10,7 @@ export interface IUser {
   createdAt: Date;
   passwordResetToken: string;
   passwordResetExpires: Date;
+  role: USER_ROLES;
 
   createPasswordResetToken: string;
 }
