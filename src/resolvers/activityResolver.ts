@@ -10,7 +10,11 @@ export class ActivityResolver {
   @Authorized()
   @Query(() => [Activity])
   async getAllActivities(): Promise<Activity[]> {
-    const allActivities = await dataSource.getRepository(Activity).find();
+    const allActivities = await dataSource.getRepository(Activity).find({
+      relations: {
+        activityType: true,
+      },
+    });
 
     return allActivities;
   }
