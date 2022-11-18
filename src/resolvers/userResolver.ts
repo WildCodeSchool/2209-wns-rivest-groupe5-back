@@ -6,6 +6,7 @@ import dataSource from "../utils/datasource";
 import Email from "../services/email";
 import { getFrontendBaseUrl } from "../utils/getBaseUrls";
 import hashSha256 from "../utils/hashSha256";
+import { USER_ROLES } from "../utils/userRoles";
 
 @Resolver(User)
 export class UserResolver {
@@ -32,7 +33,7 @@ export class UserResolver {
 
       if (await argon2.verify(userFromDB.password, password)) {
         const token = jwt.sign(
-          { email: userFromDB.email },
+          { email: userFromDB.email, role: userFromDB.role },
           process.env.JWT_SECRET_KEY
         );
         return token;
@@ -117,6 +118,7 @@ export class UserResolver {
     newUser.firstname = firstname;
     newUser.lastname = lastname;
     newUser.password = await argon2.hash(password);
+    newUser.role = USER_ROLES.USER;
     const userFromDB = await dataSource.manager.save(User, newUser);
 
     await new Email(userFromDB, getFrontendBaseUrl()).sendWelcome();

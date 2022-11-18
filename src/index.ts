@@ -28,12 +28,15 @@ async function start(): Promise<void> {
         ContributionResolver,
         GoodDealResolver,
       ],
-      authChecker: ({ context }) => {
-        console.log("context", context);
+      authChecker: ({ context }, roles) => {
+        // roles = roles in @Authorized decorators in resolvers
+
         if (context.email === undefined) {
           return false;
-        } else {
+        } else if (roles.length === 0 || roles.includes(context.role)) {
           return true;
+        } else {
+          return false;
         }
       },
     });
