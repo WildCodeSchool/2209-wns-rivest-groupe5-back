@@ -36,10 +36,8 @@ async function start(): Promise<void> {
         if (context.user.email === undefined) {
           return false;
         } else if (roles.length === 0 || roles.includes(context.user.role)) {
-          console.log("User Role authorized");
           return true;
         } else {
-          console.log("User Role NOT authorized");
           return false;
         }
       },
@@ -65,7 +63,7 @@ async function start(): Promise<void> {
 
               const user = await dataSource
                 .getRepository(User)
-                .findOneByOrFail({ userId: userToken.userId });
+                .findOneByOrFail({ email: userToken.email });
 
               return { user: user };
             } else {
