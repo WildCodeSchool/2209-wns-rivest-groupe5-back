@@ -19,6 +19,7 @@ export class ActivityResolver {
     return allActivities;
   }
 
+  @Authorized()
   @Mutation(() => Activity)
   async createActivity(
     @Arg("title") title: string,
