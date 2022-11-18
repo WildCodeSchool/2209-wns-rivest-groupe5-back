@@ -4,6 +4,12 @@ import jwt from "jsonwebtoken";
 import { User } from "../entities/user";
 import dataSource from "../utils/datasource";
 import Email from "../services/email";
+import { IUser } from "../interfaces/entities/IUser";
+
+interface IGetTokenResponse {
+  token: string;
+  userFromDB: IUser;
+}
 
 @Resolver(User)
 export class UserResolver {
@@ -13,11 +19,11 @@ export class UserResolver {
     return getUserdata;
   }
 
-  @Query(() => String)
+  @Query(() => Object)
   async getToken(
     @Arg("email") email: string,
     @Arg("password") password: string
-  ): Promise<string> {
+  ): Promise<IGetTokenResponse> {
     try {
       const userFromDB = await dataSource.manager.findOneByOrFail(User, {
         email,
@@ -31,7 +37,7 @@ export class UserResolver {
           { email: userFromDB.email },
           process.env.JWT_SECRET_KEY
         );
-        return token;
+        return { token, userFromDB };
       } else {
         throw new Error();
       }
