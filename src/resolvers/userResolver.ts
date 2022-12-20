@@ -1,4 +1,12 @@
-import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Field,
+  Authorized,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
+} from "type-graphql";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { User } from "../entities/user";
@@ -8,20 +16,30 @@ import { getFrontendBaseUrl } from "../utils/getBaseUrls";
 import hashSha256 from "../utils/hashSha256";
 import { USER_ROLES } from "../utils/userRoles";
 
+@ObjectType()
+class LoginResponse {
+  @Field()
+  token: string;
+
+  @Field(() => User)
+  userFromDB: User;
+}
+
 @Resolver(User)
 export class UserResolver {
-  @Query(() => [User])
-  async getAllUsers(): Promise<User[]> {
-    const allUsers = await dataSource.getRepository(User).find();
-
-    return allUsers;
+  @Query(() => User)
+  async getUserById(@Arg("userId") userId: number): Promise<User> {
+    const getUserdata = await dataSource
+      .getRepository(User)
+      .findOneByOrFail({ userId });
+    return getUserdata;
   }
 
-  @Query(() => String)
+  @Query(() => LoginResponse)
   async getToken(
     @Arg("email") email: string,
     @Arg("password") password: string
-  ): Promise<string> {
+  ): Promise<LoginResponse> {
     try {
       const userFromDB = await dataSource.manager.findOneByOrFail(User, {
         email,
@@ -38,7 +56,7 @@ export class UserResolver {
           },
           process.env.JWT_SECRET_KEY
         );
-        return token;
+        return { token, userFromDB };
       } else {
         throw new Error();
       }
