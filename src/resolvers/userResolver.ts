@@ -33,7 +33,9 @@ export class UserResolver {
 
       if (await argon2.verify(userFromDB.password, password)) {
         const token = jwt.sign(
-          { email: userFromDB.email, role: userFromDB.role },
+          {
+            email: userFromDB.email,
+          },
           process.env.JWT_SECRET_KEY
         );
         return token;

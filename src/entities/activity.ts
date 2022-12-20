@@ -1,5 +1,11 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { IActivity } from "../interfaces/entities/IActivity";
 import { ActivityType } from "./activityType";
 import { User } from "./user";
@@ -31,11 +37,11 @@ export class Activity implements IActivity {
   @CreateDateColumn({ name: "createdAt" })
   createdAt: Date;
 
-  @Field(() => ActivityType, { nullable: true })
+  @Field(() => ActivityType)
   @ManyToOne(() => ActivityType, (activityType) => activityType.activities)
   activityType: ActivityType;
 
-  @Field(() => User, { nullable: false })
+  @Field(() => User)
   @ManyToOne(() => User, (user) => user.activities)
   user: User;
 }
