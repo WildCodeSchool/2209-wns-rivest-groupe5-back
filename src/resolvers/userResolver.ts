@@ -1,4 +1,4 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { User } from "../entities/user";
@@ -124,5 +124,21 @@ export class UserResolver {
     await new Email(userFromDB, getFrontendBaseUrl()).sendWelcome();
 
     return userFromDB;
+  }
+
+  @Authorized()
+  @Mutation(() => Boolean)
+  async inviteFriend(@Arg("email") email: string): Promise<Boolean> {
+    if (email === undefined || email.trim() === "")
+      throw new Error("No email provided to invite a friend.");
+
+    const fictiveUser = new User();
+    fictiveUser.email = email;
+
+    const registerUrl = `${getFrontendBaseUrl()}/register`;
+
+    await new Email(fictiveUser, registerUrl).sendInvitation();
+
+    return true;
   }
 }

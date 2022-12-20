@@ -89,4 +89,8 @@ export default class Email implements IEmailCreation {
       "Réinitialisez votre mot de passe WildCarbon"
     );
   }
+
+  async sendInvitation(): Promise<void> {
+    await this.send("invite-friend", "Invitation à rejoindre WildCarbon");
+  }
 }
