@@ -7,7 +7,7 @@ import { User } from "../entities/user";
 
 const dataSource = new DataSource({
   type: "postgres",
-  host: "db",
+  host: process.env.DB || "db",
   port: 5432,
   username: "postgres",
   password: "example",
