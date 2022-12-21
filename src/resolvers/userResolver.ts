@@ -6,6 +6,7 @@ import {
   ObjectType,
   Query,
   Resolver,
+  Ctx,
 } from "type-graphql";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
@@ -27,6 +28,15 @@ class LoginResponse {
 
 @Resolver(User)
 export class UserResolver {
+  @Authorized()
+  @Query(() => User)
+  async getMyUserData(@Ctx() context: any): Promise<User> {
+    const myUserData = await dataSource
+      .getRepository(User)
+      .findOneByOrFail({ email: context.user.email });
+    return myUserData;
+  }
+
   @Query(() => User)
   async getUserById(@Arg("userId") userId: number): Promise<User> {
     const getUserdata = await dataSource
