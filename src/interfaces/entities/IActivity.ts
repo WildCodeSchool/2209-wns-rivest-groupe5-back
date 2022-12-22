@@ -1,8 +1,8 @@
 export interface IActivity {
   activityId: number;
   title: string;
-  activityDate: Date;
+  activityDate?: Date;
   carbonQuantity: number;
-  description: string;
+  description?: string;
   createdAt: Date;
 }

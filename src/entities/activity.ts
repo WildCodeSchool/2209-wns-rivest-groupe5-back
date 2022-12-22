@@ -22,16 +22,16 @@ export class Activity implements IActivity {
   title: string;
 
   @Field()
-  @Column()
-  activityDate: Date;
+  @Column({ default: new Date() })
+  activityDate?: Date;
 
   @Field()
   @Column()
   carbonQuantity: number;
 
   @Field()
-  @Column()
-  description: string;
+  @Column({ nullable: true })
+  description?: string;
 
   @Field()
   @CreateDateColumn({ name: "createdAt" })
