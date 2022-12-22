@@ -1,5 +1,3 @@
-####Lancer en DEV
-docker compose -f docker-compose.dev.yml up --build
+# Projet backend de Wildcarbon
 
-####Lancer en PROD
-docker compose up --build
+Voir la documentation complète sur [https://github.com/WildCodeSchool/2209-wns-rivest-groupe5-root](https://github.com/WildCodeSchool/2209-wns-rivest-groupe5-root)
