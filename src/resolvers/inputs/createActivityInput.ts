@@ -15,6 +15,6 @@ export class CreateActivityInput {
   @Field(() => String, { nullable: true })
   description?: string;
 
-  @Field(() => String)
-  activityTypeName: string;
+  @Field(() => Number)
+  activityTypeId: number;
 }
