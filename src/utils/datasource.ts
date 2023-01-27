@@ -3,6 +3,7 @@ import { Activity } from "../entities/activity";
 import { ActivityType } from "../entities/activityType";
 import { Contribution } from "../entities/contribution";
 import { GoodDeal } from "../entities/goodDeal";
+import { GoodDealVote } from "../entities/gooDealVote";
 import { User } from "../entities/user";
 
 const dataSource = new DataSource({
@@ -13,7 +14,14 @@ const dataSource = new DataSource({
   password: "example",
   database: "postgres",
   synchronize: true,
-  entities: [User, Activity, ActivityType, Contribution, GoodDeal],
+  entities: [
+    User,
+    Activity,
+    ActivityType,
+    Contribution,
+    GoodDeal,
+    GoodDealVote,
+  ],
   // logging: ["query", "error"],
 });
 

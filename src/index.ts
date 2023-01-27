@@ -13,6 +13,7 @@ import { TokenResolver } from "./resolvers/tokenResolver";
 import { IDecodedJWT } from "./interfaces/general/IDecodedJWT";
 import { User } from "./entities/user";
 import { DeleteAllEntitiesResolver } from "./resolvers/testResolver";
+import { GoodDealVoteResolver } from "./resolvers/goodDealVoteResolver";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ async function start(): Promise<void> {
         ActivityTypeResolver,
         ContributionResolver,
         GoodDealResolver,
+        GoodDealVoteResolver,
         DeleteAllEntitiesResolver,
       ],
       authChecker: ({ context }, roles) => {

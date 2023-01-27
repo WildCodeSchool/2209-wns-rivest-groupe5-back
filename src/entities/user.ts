@@ -12,6 +12,7 @@ import { Contribution } from "./contribution";
 import { GoodDeal } from "./goodDeal";
 import crypto from "crypto";
 import { USER_ROLES } from "../utils/userRoles";
+import { GoodDealVote } from "./gooDealVote";
 
 @ObjectType()
 @Entity()
@@ -49,6 +50,12 @@ export class User implements IUser {
     cascade: true,
   })
   goodDeals: GoodDeal[];
+
+  @Field(() => [GoodDealVote], { nullable: true })
+  @OneToMany(() => GoodDealVote, (goodDealVote) => goodDealVote.user, {
+    cascade: true,
+  })
+  goodDealVotes: GoodDealVote[];
 
   @Field(() => [Activity], { nullable: true })
   @OneToMany(() => Activity, (activity) => activity.user, {

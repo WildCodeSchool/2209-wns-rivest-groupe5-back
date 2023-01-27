@@ -2,6 +2,7 @@ import { Context } from "apollo-server-core";
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Activity } from "../entities/activity";
 import { ActivityType } from "../entities/activityType";
+import { User } from "../entities/user";
 import { IUserCtx } from "../interfaces/general/IUserCtx";
 import dataSource from "../utils/datasource";
 import { USER_ROLES } from "../utils/userRoles";
@@ -43,7 +44,7 @@ export class ActivityResolver {
     newActivity.carbonQuantity = createActivity.carbonQuantity;
     newActivity.description = createActivity.description;
     newActivity.activityType = activityTypeFromDb;
-    newActivity.user = userFromCtx.user;
+    newActivity.user = userFromCtx.user as User;
     newActivity.createdAt = new Date();
 
     const activityFromDB = await dataSource.manager.save(Activity, newActivity);
