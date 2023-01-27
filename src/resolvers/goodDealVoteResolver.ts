@@ -8,14 +8,6 @@ import dataSource from "../utils/datasource";
 
 @Resolver(GoodDealVote)
 export class GoodDealVoteResolver {
-  // @Query(() => [GoodDealVote])
-  // async getAllGoodDeals(): Promise<GoodDealVote[]> {
-  //   const allGoodDealVotes = await dataSource
-  //     .getRepository(GoodDealVote)
-  //     .find();
-  //   return allGoodDealVotes;
-  // }
-
   @Authorized()
   @Mutation(() => GoodDealVote)
   async createGoodDealVote(
