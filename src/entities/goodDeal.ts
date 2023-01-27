@@ -3,10 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { IGoodDeal } from "../interfaces/entities/IGoodDeal";
+import { GoodDealVote } from "./gooDealVote";
 import { User } from "./user";
 
 @ObjectType()
@@ -22,15 +25,21 @@ export class GoodDeal implements IGoodDeal {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  goodDealLink: string;
+  goodDealLink?: string;
 
   @Field()
   @Column()
   goodDealContent: string;
 
+  @Field(() => [GoodDealVote], { nullable: true })
+  @OneToMany(() => GoodDealVote, (goodDealVote) => goodDealVote.goodDeal, {
+    cascade: true,
+  })
+  goodDealVotes: GoodDealVote[];
+
   @Field({ nullable: true })
   @Column({ nullable: true })
-  image: string;
+  image?: string;
 
   @Field()
   @CreateDateColumn({ name: "createdAt" })
