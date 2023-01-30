@@ -79,6 +79,7 @@ async function start(): Promise<void> {
           }
         }
       },
+      persistedQueries: false,
     });
 
     try {
