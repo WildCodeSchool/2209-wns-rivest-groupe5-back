@@ -25,6 +25,26 @@ export class ActivityResolver {
   }
 
   @Authorized()
+  @Query(() => [Activity])
+  async getAllMyActivities(@Ctx() ctx: Context): Promise<Activity[]> {
+    const userFromCtx = ctx as IUserCtx;
+
+    const allActivities = await dataSource.getRepository(Activity).find({
+      relations: {
+        activityType: true,
+        user: true,
+      },
+      where: {
+        user: {
+          userId: userFromCtx.user.userId,
+        },
+      },
+    });
+
+    return allActivities;
+  }
+
+  @Authorized()
   @Mutation(() => Activity)
   async createActivity(
     @Ctx() ctx: Context,
