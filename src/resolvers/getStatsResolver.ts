@@ -234,11 +234,6 @@ export class GetStatsResolver {
       });
     }
 
-    console.log(
-      "🚀 ~ file: getStatsResolver.ts:172 ~ GetStatsResolver ~ dataForGraph",
-      dataForGraph
-    );
-
     return dataForGraph;
   }
 
