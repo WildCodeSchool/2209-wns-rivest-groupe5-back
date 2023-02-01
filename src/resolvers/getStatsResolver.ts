@@ -6,10 +6,7 @@ import dataSource from "../utils/datasource";
 import { getDateXDaysAgoDaysInfos } from "../utils/dates/datesUtils";
 import { Between, MoreThan } from "typeorm";
 import { IObjectActivitiesArray } from "../interfaces/general/IObjectActivitiesArray";
-import {
-  IGraphDataset,
-  IObjectGraphDataset,
-} from "../interfaces/general/IObjectGraphDataset";
+import { IObjectGraphDataset } from "../interfaces/general/IObjectGraphDataset";
 import {
   ObjectGraphDataset,
   ObjectGraphDatasetPie,
@@ -154,7 +151,7 @@ export class GetStatsResolver {
 
     let key: keyof typeof ACTIVITY_TYPES;
     for (key in ACTIVITY_TYPES) {
-      labels.push(ACTIVITY_TYPES[key].name);
+      labels.push(ACTIVITY_TYPES[key].label);
       colors.push(ACTIVITY_TYPES[key].backgroundColor);
       emojis.push(ACTIVITY_TYPES[key].emoji);
       sums.push(0);
@@ -179,18 +176,13 @@ export class GetStatsResolver {
         {
           id: 0,
           name: "all",
-          label: "all",
+          label: "Quantité (kg)",
           emoji: emojis,
           backgroundColor: colors,
           data: sums,
         },
       ],
     };
-
-    // console.log(
-    //   "🚀 ~ file: getStatsResolver.ts:172 ~ GetStatsResolver ~ dataForGraph",
-    //   dataForGraph
-    // );
 
     return dataForGraph;
   }
