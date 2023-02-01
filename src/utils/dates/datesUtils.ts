@@ -19,7 +19,10 @@ export const getDateXDaysAgoDaysInfos = (daysAgo: number): dayInfos[] => {
   const now = new Date();
 
   const lastXDaysInfos: dayInfos[] = [];
-  const oldestDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+  // daysAgo - 1 to include currentDay
+  const oldestDate = new Date(
+    now.getTime() - (daysAgo - 1) * 24 * 60 * 60 * 1000
+  );
 
   for (let i = 0; i < daysAgo; i++) {
     const baseDateMS = oldestDate.getTime();

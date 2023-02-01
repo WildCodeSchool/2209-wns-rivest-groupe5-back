@@ -3,10 +3,7 @@ import { Context } from "apollo-server-core";
 import { Activity } from "../entities/activity";
 import { IUserCtx } from "../interfaces/general/IUserCtx";
 import dataSource from "../utils/datasource";
-import {
-  getDateXDaysAgo,
-  getDateXDaysAgoDaysInfos,
-} from "../utils/dates/datesUtils";
+import { getDateXDaysAgoDaysInfos } from "../utils/dates/datesUtils";
 import { Between, MoreThan } from "typeorm";
 import { IObjectActivitiesArray } from "../interfaces/general/IObjectActivitiesArray";
 import { IObjectGraphDataset } from "../interfaces/general/IObjectGraphDataset";
@@ -78,75 +75,72 @@ export class GetStatsResolver {
       ],
     };
 
-    await Promise.all(
-      lastDaysInfos.map(async (day) => {
-        // get all activities per day
-        const activitiesOfTheDay = await dataSource
-          .getRepository(Activity)
-          .find({
-            relations: {
-              activityType: true,
-            },
-            where: {
-              user: {
-                userId: userFromCtx.user.userId,
-              },
-              activityDate: Between(day.start, day.end),
-            },
-          });
+    for await (const day of lastDaysInfos) {
+      // get all activities per day
+      const activitiesOfTheDay = await dataSource.getRepository(Activity).find({
+        relations: {
+          activityType: true,
+        },
+        where: {
+          user: {
+            userId: userFromCtx.user.userId,
+          },
+          activityDate: Between(day.start, day.end),
+        },
+      });
 
-        // Group activities of the day per activityType
-        const totalPerActivityType: IObjectActivitiesArray = {
-          transport: [],
-          numeric: [],
-          food: [],
-          energy: [],
-          appliance: [],
-          other: [],
-        };
+      // Group activities of the day per activityType
+      const totalPerActivityType: IObjectActivitiesArray = {
+        transport: [],
+        numeric: [],
+        food: [],
+        energy: [],
+        appliance: [],
+        other: [],
+      };
 
-        // for each activityType, sum total of carbonQuantity
-        activitiesOfTheDay.forEach((activity) => {
-          switch (activity.activityType.activityTypeId) {
-            case 1:
-              totalPerActivityType.transport.push(activity);
-              break;
-            case 2:
-              totalPerActivityType.numeric.push(activity);
-              break;
-            case 3:
-              totalPerActivityType.alimentation.push(activity);
-              break;
-            case 4:
-              totalPerActivityType.energy.push(activity);
-              break;
-            case 5:
-              totalPerActivityType.appliance.push(activity);
-              break;
-            default:
-              totalPerActivityType.other.push(activity);
-          }
-        });
+      // for each activityType, sum total of carbonQuantity
+      activitiesOfTheDay.forEach((activity) => {
+        switch (activity.activityType.activityTypeId) {
+          case 1:
+            totalPerActivityType.transport.push(activity);
+            break;
+          case 2:
+            totalPerActivityType.numeric.push(activity);
+            break;
+          case 3:
+            totalPerActivityType.alimentation.push(activity);
+            break;
+          case 4:
+            totalPerActivityType.energy.push(activity);
+            break;
+          case 5:
+            totalPerActivityType.appliance.push(activity);
+            break;
+          default:
+            totalPerActivityType.other.push(activity);
+        }
+      });
 
-        Object.keys(totalPerActivityType).forEach(function (key, index) {
-          // calculate total, default value at 0
-          let totalCarbonPerActivityTypeOfTheDay = 0;
+      Object.keys(totalPerActivityType).forEach(function (key, index) {
+        // calculate total, default value at 0
+        let totalCarbonPerActivityTypeOfTheDay = 0;
 
-          if (totalPerActivityType[key].length !== 0) {
-            totalCarbonPerActivityTypeOfTheDay = totalPerActivityType[
-              key
-            ].reduce((acc, curr) => acc + curr.carbonQuantity, 0);
-          }
-
-          // add value to the data object
-          const targetDataset = dataForGraph.datasets.find(
-            (dataset) => dataset.name === key
+        if (totalPerActivityType[key].length !== 0) {
+          totalCarbonPerActivityTypeOfTheDay = totalPerActivityType[key].reduce(
+            (acc, curr) => acc + curr.carbonQuantity,
+            0
           );
+        }
 
-          targetDataset?.data.push(totalCarbonPerActivityTypeOfTheDay);
-        });
-      })
-    );
+        // add value to the data object
+        const targetDataset = dataForGraph.datasets.find(
+          (dataset) => dataset.name === key
+        );
+
+        targetDataset?.data.push(totalCarbonPerActivityTypeOfTheDay);
+      });
+    }
 
     return dataForGraph;
   }
