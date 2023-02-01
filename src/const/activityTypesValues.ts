@@ -1,5 +1,3 @@
-// export type activityTypeType = "transport"|"numeric"|"food"|"energy"|"appliance"|"other";
-
 export const ACTIVITY_TYPES = {
   transport: {
     id: 1,
