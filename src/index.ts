@@ -14,6 +14,7 @@ import { IDecodedJWT } from "./interfaces/general/IDecodedJWT";
 import { User } from "./entities/user";
 import { DeleteAllEntitiesResolver } from "./resolvers/testResolver";
 import { GoodDealVoteResolver } from "./resolvers/goodDealVoteResolver";
+import { GetStatsResolver } from "./resolvers/getStatsResolver";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ async function start(): Promise<void> {
         GoodDealResolver,
         GoodDealVoteResolver,
         DeleteAllEntitiesResolver,
+        GetStatsResolver,
       ],
       authChecker: ({ context }, roles) => {
         // roles = roles in @Authorized decorators in resolvers
