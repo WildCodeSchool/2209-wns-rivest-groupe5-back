@@ -4,10 +4,10 @@ export interface IObjectGraphDataset {
 }
 
 export interface IGraphDataset {
-  id: number;
-  name: string;
-  label: string;
-  emoji: string;
-  backgroundColor: string;
+  id?: number;
+  name?: string;
+  label?: string;
+  emoji?: string | string[];
+  backgroundColor: string | string[];
   data: number[];
 }
