@@ -3,7 +3,10 @@ import { Context } from "apollo-server-core";
 import { Activity } from "../entities/activity";
 import { IUserCtx } from "../interfaces/general/IUserCtx";
 import dataSource from "../utils/datasource";
-import { getDateXDaysAgoDaysInfos } from "../utils/dates/datesUtils";
+import {
+  getDateXDaysAgoDaysInfos,
+  getDateXWeeksAgoInfos,
+} from "../utils/dates/datesUtils";
 import { Between, MoreThan } from "typeorm";
 import { IObjectActivitiesArray } from "../interfaces/general/IObjectActivitiesArray";
 import { IObjectGraphDataset } from "../interfaces/general/IObjectGraphDataset";
@@ -120,6 +123,121 @@ export class GetStatsResolver {
         targetDataset?.data.push(totalCarbonPerActivityTypeOfTheDay);
       });
     }
+
+    return dataForGraph;
+  }
+
+  @Authorized()
+  @Query(() => ObjectGraphDataset)
+  async getMyLastMonthActivities(
+    @Ctx() ctx: Context
+  ): Promise<IObjectGraphDataset> {
+    const userFromCtx = ctx as IUserCtx;
+
+    const lastWeeksInfos = getDateXWeeksAgoInfos(4);
+
+    const dataForGraph: IObjectGraphDataset = {
+      labels: lastWeeksInfos.map((week) => week.name),
+      datasets: [
+        {
+          ...ACTIVITY_TYPES.transport,
+          data: [],
+        },
+        {
+          ...ACTIVITY_TYPES.numeric,
+          data: [],
+        },
+        {
+          ...ACTIVITY_TYPES.food,
+          data: [],
+        },
+        {
+          ...ACTIVITY_TYPES.energy,
+          data: [],
+        },
+        {
+          ...ACTIVITY_TYPES.appliance,
+          data: [],
+        },
+        {
+          ...ACTIVITY_TYPES.other,
+          data: [],
+        },
+      ],
+    };
+
+    for await (const week of lastWeeksInfos) {
+      // get all activities per week
+      const activitiesOfTheWeek = await dataSource
+        .getRepository(Activity)
+        .find({
+          relations: {
+            activityType: true,
+          },
+          where: {
+            user: {
+              userId: userFromCtx.user.userId,
+            },
+            activityDate: Between(week.start, week.end),
+          },
+        });
+
+      // Group activities of the day per activityType
+      const totalPerActivityType: IObjectActivitiesArray = {
+        transport: [],
+        numeric: [],
+        food: [],
+        energy: [],
+        appliance: [],
+        other: [],
+      };
+
+      // for each activityType, sum total of carbonQuantity
+      activitiesOfTheWeek.forEach((activity) => {
+        switch (activity.activityType.activityTypeId) {
+          case 1:
+            totalPerActivityType.transport.push(activity);
+            break;
+          case 2:
+            totalPerActivityType.numeric.push(activity);
+            break;
+          case 3:
+            totalPerActivityType.alimentation.push(activity);
+            break;
+          case 4:
+            totalPerActivityType.energy.push(activity);
+            break;
+          case 5:
+            totalPerActivityType.appliance.push(activity);
+            break;
+          default:
+            totalPerActivityType.other.push(activity);
+        }
+      });
+
+      Object.keys(totalPerActivityType).forEach(function (key, index) {
+        // calculate total, default value at 0
+        let totalCarbonPerActivityTypeOfTheWeek = 0;
+
+        if (totalPerActivityType[key].length !== 0) {
+          totalCarbonPerActivityTypeOfTheWeek = totalPerActivityType[
+            key
+          ].reduce((acc, curr) => acc + curr.carbonQuantity, 0);
+        }
+
+        // add value to the data object
+        const targetDataset = dataForGraph.datasets.find(
+          (dataset) => dataset.name === key
+        );
+
+        targetDataset?.data.push(totalCarbonPerActivityTypeOfTheWeek);
+      });
+    }
+
+    console.log(
+      "🚀 ~ file: getStatsResolver.ts:172 ~ GetStatsResolver ~ dataForGraph",
+      dataForGraph
+    );
 
     return dataForGraph;
   }
