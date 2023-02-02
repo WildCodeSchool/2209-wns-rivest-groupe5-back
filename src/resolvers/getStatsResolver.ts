@@ -73,10 +73,6 @@ const distributeActivityPerActivityTypeInObj = (
       ...activity,
       carbonQuantity: parseFloat((activity.carbonQuantity / 1000).toFixed(3)),
     };
-    console.log(
-      "🚀 ~ file: getStatsResolver.ts:73 ~ activities.forEach ~ activityConverted carbon rounded",
-      activityConverted.carbonQuantity
-    );
 
     switch (activity.activityType.activityTypeId) {
       case 1:

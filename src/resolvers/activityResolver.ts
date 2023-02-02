@@ -1,4 +1,4 @@
-import { Context } from "apollo-server-core";
+import { ApolloError, Context } from "apollo-server-core";
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Activity } from "../entities/activity";
 import { ActivityType } from "../entities/activityType";
@@ -51,6 +51,12 @@ export class ActivityResolver {
     @Arg("data") createActivity: CreateActivityInput
   ): Promise<Activity> {
     const userFromCtx = ctx as IUserCtx;
+
+    if (createActivity.carbonQuantity <= 0) {
+      throw new ApolloError(
+        "La quantité de carbone émise doit être supérieure à 0."
+      );
+    }
 
     const activityTypeFromDb = await dataSource
       .getRepository(ActivityType)
