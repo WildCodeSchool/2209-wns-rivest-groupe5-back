@@ -1,4 +1,4 @@
-import { JOURS } from "./frenchDateNames";
+import { JOURS, MOIS } from "./frenchDateNames";
 
 export const getDateXDaysAgo = (daysAgo: number): Date => {
   const now = new Date();
@@ -45,6 +45,7 @@ export const getDateXWeeksAgoInfos = (weeksAgo: number): periodInfos[] => {
   const now = new Date();
 
   const lastXWeeksInfos: periodInfos[] = [];
+
   const oldestDate = new Date(
     now.getTime() - weeksAgo * 7 * 24 * 60 * 60 * 1000
   );
@@ -77,4 +78,49 @@ export const getDateXWeeksAgoInfos = (weeksAgo: number): periodInfos[] => {
   }
 
   return lastXWeeksInfos;
+};
+
+export const getDateXMonthsAgoInfos = (monthsAgo: number): periodInfos[] => {
+  const now = new Date();
+
+  const lastXMonthsInfos: periodInfos[] = [];
+
+  const oldestMonthsAgoDate = new Date(
+    now.setMonth(now.getMonth() - (monthsAgo - 1))
+  );
+
+  const startOfTheOldestMonth = new Date(
+    oldestMonthsAgoDate.getUTCFullYear(),
+    oldestMonthsAgoDate.getUTCMonth(),
+    1
+  );
+
+  for (let i = 0; i < monthsAgo; i++) {
+    const startOfOldestCopy = new Date(startOfTheOldestMonth); // don't mutate original value
+
+    const monthDateBegin = new Date(
+      startOfOldestCopy.setMonth(startOfOldestCopy.getMonth() + i)
+    );
+    const startOfMonth = new Date(monthDateBegin.setUTCHours(0, 0, 0, 0));
+
+    const endOfCurrentMonth = new Date(
+      monthDateBegin.getUTCFullYear(),
+      monthDateBegin.getUTCMonth() + 1,
+      0
+    );
+
+    const endOfMonth = new Date(endOfCurrentMonth.setUTCHours(23, 59, 59, 999));
+
+    const currentMonthFrenchName = MOIS[monthDateBegin.getMonth()];
+
+    const monthInfos = {
+      start: startOfMonth,
+      end: endOfMonth,
+      name: currentMonthFrenchName,
+    };
+
+    lastXMonthsInfos.push(monthInfos);
+  }
+
+  return lastXMonthsInfos;
 };
