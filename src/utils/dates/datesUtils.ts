@@ -1,4 +1,4 @@
-import { JOURS } from "./frenchDateNames";
+import { JOURS, MOIS } from "./frenchDateNames";
 
 export const getDateXDaysAgo = (daysAgo: number): Date => {
   const now = new Date();
@@ -45,31 +45,43 @@ export const getDateXWeeksAgoInfos = (weeksAgo: number): periodInfos[] => {
   const now = new Date();
 
   const lastXWeeksInfos: periodInfos[] = [];
+
+  // go back X weeks ago
   const oldestDate = new Date(
-    now.getTime() - weeksAgo * 7 * 24 * 60 * 60 * 1000
+    now.getTime() - (weeksAgo - 1) * 7 * 24 * 60 * 60 * 1000
   );
 
-  for (let i = 0; i < weeksAgo * 7; i += 7) {
-    const baseDateMS = oldestDate.getTime();
-    const newDayDate = baseDateMS + i * 3600 * 24 * 1000;
-    const date = new Date(newDayDate);
+  // get day of the week
+  const day = oldestDate.getDay();
 
-    const name =
-      weeksAgo * 7 - i === 7
-        ? "Cette semaine"
-        : weeksAgo * 7 - i === 14
-        ? "Il y a une semaine"
-        : `Il y a ${(weeksAgo * 7 - i) / 7 - 1} semaines`;
+  // get diff between day of month and day of week (-6 if sunday to return to monday, otherwise +1)
+  const diff = oldestDate.getDate() - day + (day === 0 ? -6 : 1);
 
-    const startOfTheWeekDate = new Date(date.setUTCHours(0, 0, 0, 0));
-    const endOfFirstWeekDayDate = new Date(date.setUTCHours(23, 59, 59, 999));
-    const endOfTheWeekDate = new Date(
-      endOfFirstWeekDayDate.setDate(endOfFirstWeekDayDate.getDate() + 7)
+  const startOfOldestDate = new Date(
+    new Date(oldestDate.setDate(diff)).setUTCHours(0, 0, 0, 0)
+  );
+
+  for (let i = 0; i < weeksAgo; i++) {
+    const startOfOldestCopy = new Date(startOfOldestDate);
+
+    const currWeekDateBegin = new Date(
+      startOfOldestCopy.setDate(startOfOldestCopy.getDate() + i * 7)
     );
 
+    const currWeekLastDay = new Date(currWeekDateBegin);
+    currWeekLastDay.setDate(currWeekLastDay.getDate() + 6);
+    currWeekLastDay.setUTCHours(23, 59, 59, 999);
+
+    const name =
+      i === weeksAgo - 1
+        ? "Cette semaine"
+        : i === weeksAgo - 2
+        ? "Il y a une semaine"
+        : `Il y a ${weeksAgo - i - 1} semaines`;
+
     const dayInfos = {
-      start: startOfTheWeekDate,
-      end: endOfTheWeekDate,
+      start: startOfOldestCopy,
+      end: currWeekLastDay,
       name,
     };
 
@@ -77,4 +89,49 @@ export const getDateXWeeksAgoInfos = (weeksAgo: number): periodInfos[] => {
   }
 
   return lastXWeeksInfos;
+};
+
+export const getDateXMonthsAgoInfos = (monthsAgo: number): periodInfos[] => {
+  const now = new Date();
+
+  const lastXMonthsInfos: periodInfos[] = [];
+
+  const oldestMonthsAgoDate = new Date(
+    now.setMonth(now.getMonth() - (monthsAgo - 1))
+  );
+
+  const startOfTheOldestMonth = new Date(
+    oldestMonthsAgoDate.getUTCFullYear(),
+    oldestMonthsAgoDate.getUTCMonth(),
+    1
+  );
+
+  for (let i = 0; i < monthsAgo; i++) {
+    const startOfOldestCopy = new Date(startOfTheOldestMonth); // don't mutate original value
+
+    const monthDateBegin = new Date(
+      startOfOldestCopy.setMonth(startOfOldestCopy.getMonth() + i)
+    );
+    const startOfMonth = new Date(monthDateBegin.setUTCHours(0, 0, 0, 0));
+
+    const endOfCurrentMonth = new Date(
+      monthDateBegin.getUTCFullYear(),
+      monthDateBegin.getUTCMonth() + 1,
+      0
+    );
+
+    const endOfMonth = new Date(endOfCurrentMonth.setUTCHours(23, 59, 59, 999));
+
+    const currentMonthFrenchName = MOIS[monthDateBegin.getMonth()];
+
+    const monthInfos = {
+      start: startOfMonth,
+      end: endOfMonth,
+      name: currentMonthFrenchName,
+    };
+
+    lastXMonthsInfos.push(monthInfos);
+  }
+
+  return lastXMonthsInfos;
 };
