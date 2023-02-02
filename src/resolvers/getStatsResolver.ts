@@ -203,7 +203,7 @@ export class GetStatsResolver {
             totalPerActivityType.numeric.push(activity);
             break;
           case 3:
-            totalPerActivityType.alimentation.push(activity);
+            totalPerActivityType.food.push(activity);
             break;
           case 4:
             totalPerActivityType.energy.push(activity);
@@ -313,7 +313,7 @@ export class GetStatsResolver {
             totalPerActivityType.numeric.push(activity);
             break;
           case 3:
-            totalPerActivityType.alimentation.push(activity);
+            totalPerActivityType.food.push(activity);
             break;
           case 4:
             totalPerActivityType.energy.push(activity);
