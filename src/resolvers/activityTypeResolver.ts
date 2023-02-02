@@ -2,6 +2,8 @@ import { Arg, Authorized, Mutation, Query, Resolver } from "type-graphql";
 import { ActivityType } from "../entities/activityType";
 import dataSource from "../utils/datasource";
 import { USER_ROLES } from "../utils/userRoles";
+import { CreateActivityTypeInput } from "./inputs/createActivityTypeInput";
+import { activityTypeLabel } from "../interfaces/entities/ActivityTypesTypesValues";
 
 @Resolver(ActivityType)
 export class ActivityTypeResolver {
@@ -16,9 +18,14 @@ export class ActivityTypeResolver {
 
   @Authorized(USER_ROLES.ADMIN)
   @Mutation(() => ActivityType)
-  async createActivityType(@Arg("name") name: string): Promise<ActivityType> {
+  async createActivityType(
+    @Arg("data") createActivityType: CreateActivityTypeInput
+  ): Promise<ActivityType> {
     const newActivityType = new ActivityType();
-    newActivityType.name = name;
+    newActivityType.name = createActivityType.name;
+    newActivityType.label = createActivityType.label;
+    newActivityType.emoji = createActivityType.emoji;
+    newActivityType.backgroundColor = createActivityType.backgroundColor;
 
     const createdActivityType = await dataSource
       .getRepository(ActivityType)

@@ -8,7 +8,7 @@ import {
   getDateXMonthsAgoInfos,
   getDateXWeeksAgoInfos,
 } from "../utils/dates/datesUtils";
-import { Between, MoreThan } from "typeorm";
+import { Between } from "typeorm";
 import { IObjectActivitiesArray } from "../interfaces/general/IObjectActivitiesArray";
 import { IObjectGraphDataset } from "../interfaces/general/IObjectGraphDataset";
 import {
@@ -18,6 +18,10 @@ import {
 import { ACTIVITY_TYPES } from "../const/activityTypesValues";
 import { IActivity } from "../interfaces/entities/IActivity";
 import { IPeriodInfos } from "../interfaces/general/IPeriodInfos";
+import {
+  activityTypeLabel,
+  activityTypeName,
+} from "../interfaces/entities/ActivityTypesTypesValues";
 
 const getBaseDataForGraphObj = (
   timeInfos: IPeriodInfos[]
@@ -55,7 +59,7 @@ const getBaseDataForGraphObj = (
 
 const getBaseActivitiesPerActivityTypesObj = (): IObjectActivitiesArray => {
   return {
-    transport: [],
+    activityTypeName: [],
     numeric: [],
     food: [],
     energy: [],
@@ -145,7 +149,7 @@ export class GetStatsResolver {
 
         // add value to the data object
         const targetDataset = dataForGraph.datasets.find(
-          (dataset) => dataset.name === key
+          (dataset) => dataset.name?.toString() === key
         );
 
         targetDataset?.data.push(totalCarbonPerActivityTypeOfTheDay);
@@ -203,7 +207,7 @@ export class GetStatsResolver {
 
         // add value to the data object
         const targetDataset = dataForGraph.datasets.find(
-          (dataset) => dataset.name === key
+          (dataset) => dataset.name?.toString() === key
         );
 
         targetDataset?.data.push(totalCarbonPerActivityTypeOfTheWeek);
@@ -261,7 +265,7 @@ export class GetStatsResolver {
 
         // add value to the data object
         const targetDataset = dataForGraph.datasets.find(
-          (dataset) => dataset.name === key
+          (dataset) => dataset.name?.toString() === key
         );
 
         targetDataset?.data.push(totalCarbonPerActivityTypeOfTheMonth);
@@ -320,12 +324,12 @@ export class GetStatsResolver {
     const roundedSums = sums.map((sum) => parseFloat((sum / 1000).toFixed(3)));
 
     const dataForGraph: IObjectGraphDataset = {
-      labels,
+      labels: labels.map((label) => label.toString()),
       datasets: [
         {
           id: 0,
-          name: "all",
-          label: "Quantité (kg)",
+          name: activityTypeName.all,
+          label: activityTypeLabel.QuantiteKG,
           emoji: emojis,
           backgroundColor: colors,
           data: roundedSums,
