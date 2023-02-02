@@ -16,6 +16,89 @@ import {
   ObjectGraphDatasetPie,
 } from "../entities/graphs/objectGraphDataset";
 import { ACTIVITY_TYPES } from "../const/activityTypesValues";
+import { IActivity } from "../interfaces/entities/IActivity";
+import { IPeriodInfos } from "../interfaces/general/IPeriodInfos";
+
+const getBaseDataForGraphObj = (
+  timeInfos: IPeriodInfos[]
+): IObjectGraphDataset => {
+  return {
+    labels: timeInfos.map((timeUnit) => timeUnit.name),
+    datasets: [
+      {
+        ...ACTIVITY_TYPES.transport,
+        data: [],
+      },
+      {
+        ...ACTIVITY_TYPES.numeric,
+        data: [],
+      },
+      {
+        ...ACTIVITY_TYPES.food,
+        data: [],
+      },
+      {
+        ...ACTIVITY_TYPES.energy,
+        data: [],
+      },
+      {
+        ...ACTIVITY_TYPES.appliance,
+        data: [],
+      },
+      {
+        ...ACTIVITY_TYPES.other,
+        data: [],
+      },
+    ],
+  };
+};
+
+const getBaseActivitiesPerActivityTypesObj = (): IObjectActivitiesArray => {
+  return {
+    transport: [],
+    numeric: [],
+    food: [],
+    energy: [],
+    appliance: [],
+    other: [],
+  };
+};
+
+const distributeActivityPerActivityTypeInObj = (
+  activities: Activity[],
+  toObj: IObjectActivitiesArray
+) => {
+  activities.forEach((activity) => {
+    const activityConverted: IActivity = {
+      ...activity,
+      carbonQuantity: parseFloat((activity.carbonQuantity / 1000).toFixed(3)),
+    };
+    console.log(
+      "🚀 ~ file: getStatsResolver.ts:73 ~ activities.forEach ~ activityConverted carbon rounded",
+      activityConverted.carbonQuantity
+    );
+
+    switch (activity.activityType.activityTypeId) {
+      case 1:
+        toObj.transport.push(activityConverted);
+        break;
+      case 2:
+        toObj.numeric.push(activityConverted);
+        break;
+      case 3:
+        toObj.food.push(activityConverted);
+        break;
+      case 4:
+        toObj.energy.push(activityConverted);
+        break;
+      case 5:
+        toObj.appliance.push(activityConverted);
+        break;
+      default:
+        toObj.other.push(activityConverted);
+    }
+  });
+};
 
 @Resolver(ObjectGraphDataset)
 export class GetStatsResolver {
@@ -28,35 +111,7 @@ export class GetStatsResolver {
 
     const lastDaysInfos = getDateXDaysAgoDaysInfos(7);
 
-    const dataForGraph: IObjectGraphDataset = {
-      labels: lastDaysInfos.map((day) => day.name),
-      datasets: [
-        {
-          ...ACTIVITY_TYPES.transport,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.numeric,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.food,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.energy,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.appliance,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.other,
-          data: [],
-        },
-      ],
-    };
+    const dataForGraph = getBaseDataForGraphObj(lastDaysInfos);
 
     for await (const day of lastDaysInfos) {
       // get all activities per day
@@ -73,37 +128,13 @@ export class GetStatsResolver {
       });
 
       // Group activities of the day per activityType
-      const totalPerActivityType: IObjectActivitiesArray = {
-        transport: [],
-        numeric: [],
-        food: [],
-        energy: [],
-        appliance: [],
-        other: [],
-      };
+      const totalPerActivityType = getBaseActivitiesPerActivityTypesObj();
 
       // for each activityType, sum total of carbonQuantity
-      activitiesOfTheDay.forEach((activity) => {
-        switch (activity.activityType.activityTypeId) {
-          case 1:
-            totalPerActivityType.transport.push(activity);
-            break;
-          case 2:
-            totalPerActivityType.numeric.push(activity);
-            break;
-          case 3:
-            totalPerActivityType.alimentation.push(activity);
-            break;
-          case 4:
-            totalPerActivityType.energy.push(activity);
-            break;
-          case 5:
-            totalPerActivityType.appliance.push(activity);
-            break;
-          default:
-            totalPerActivityType.other.push(activity);
-        }
-      });
+      distributeActivityPerActivityTypeInObj(
+        activitiesOfTheDay,
+        totalPerActivityType
+      );
 
       Object.keys(totalPerActivityType).forEach(function (key, index) {
         // calculate total, default value at 0
@@ -137,35 +168,7 @@ export class GetStatsResolver {
 
     const lastWeeksInfos = getDateXWeeksAgoInfos(4);
 
-    const dataForGraph: IObjectGraphDataset = {
-      labels: lastWeeksInfos.map((week) => week.name),
-      datasets: [
-        {
-          ...ACTIVITY_TYPES.transport,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.numeric,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.food,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.energy,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.appliance,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.other,
-          data: [],
-        },
-      ],
-    };
+    const dataForGraph = getBaseDataForGraphObj(lastWeeksInfos);
 
     for await (const week of lastWeeksInfos) {
       // get all activities per week
@@ -184,37 +187,13 @@ export class GetStatsResolver {
         });
 
       // Group activities of the day per activityType
-      const totalPerActivityType: IObjectActivitiesArray = {
-        transport: [],
-        numeric: [],
-        food: [],
-        energy: [],
-        appliance: [],
-        other: [],
-      };
+      const totalPerActivityType = getBaseActivitiesPerActivityTypesObj();
 
       // for each activityType, sum total of carbonQuantity
-      activitiesOfTheWeek.forEach((activity) => {
-        switch (activity.activityType.activityTypeId) {
-          case 1:
-            totalPerActivityType.transport.push(activity);
-            break;
-          case 2:
-            totalPerActivityType.numeric.push(activity);
-            break;
-          case 3:
-            totalPerActivityType.food.push(activity);
-            break;
-          case 4:
-            totalPerActivityType.energy.push(activity);
-            break;
-          case 5:
-            totalPerActivityType.appliance.push(activity);
-            break;
-          default:
-            totalPerActivityType.other.push(activity);
-        }
-      });
+      distributeActivityPerActivityTypeInObj(
+        activitiesOfTheWeek,
+        totalPerActivityType
+      );
 
       Object.keys(totalPerActivityType).forEach(function (key, index) {
         // calculate total, default value at 0
@@ -247,39 +226,11 @@ export class GetStatsResolver {
 
     const lastYearsInfos = getDateXMonthsAgoInfos(12);
 
-    const dataForGraph: IObjectGraphDataset = {
-      labels: lastYearsInfos.map((month) => month.name),
-      datasets: [
-        {
-          ...ACTIVITY_TYPES.transport,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.numeric,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.food,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.energy,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.appliance,
-          data: [],
-        },
-        {
-          ...ACTIVITY_TYPES.other,
-          data: [],
-        },
-      ],
-    };
+    const dataForGraph = getBaseDataForGraphObj(lastYearsInfos);
 
     for await (const month of lastYearsInfos) {
       // get all activities per month
-      const activitiesOfTheWeek = await dataSource
+      const activitiesOfTheMonth = await dataSource
         .getRepository(Activity)
         .find({
           relations: {
@@ -294,37 +245,13 @@ export class GetStatsResolver {
         });
 
       // Group activities of the day per activityType
-      const totalPerActivityType: IObjectActivitiesArray = {
-        transport: [],
-        numeric: [],
-        food: [],
-        energy: [],
-        appliance: [],
-        other: [],
-      };
+      const totalPerActivityType = getBaseActivitiesPerActivityTypesObj();
 
       // for each activityType, sum total of carbonQuantity
-      activitiesOfTheWeek.forEach((activity) => {
-        switch (activity.activityType.activityTypeId) {
-          case 1:
-            totalPerActivityType.transport.push(activity);
-            break;
-          case 2:
-            totalPerActivityType.numeric.push(activity);
-            break;
-          case 3:
-            totalPerActivityType.food.push(activity);
-            break;
-          case 4:
-            totalPerActivityType.energy.push(activity);
-            break;
-          case 5:
-            totalPerActivityType.appliance.push(activity);
-            break;
-          default:
-            totalPerActivityType.other.push(activity);
-        }
-      });
+      distributeActivityPerActivityTypeInObj(
+        activitiesOfTheMonth,
+        totalPerActivityType
+      );
 
       Object.keys(totalPerActivityType).forEach(function (key, index) {
         // calculate total, default value at 0
@@ -394,6 +321,8 @@ export class GetStatsResolver {
       }
     }
 
+    const roundedSums = sums.map((sum) => parseFloat((sum / 1000).toFixed(3)));
+
     const dataForGraph: IObjectGraphDataset = {
       labels,
       datasets: [
@@ -403,7 +332,7 @@ export class GetStatsResolver {
           label: "Quantité (kg)",
           emoji: emojis,
           backgroundColor: colors,
-          data: sums,
+          data: roundedSums,
         },
       ],
     };

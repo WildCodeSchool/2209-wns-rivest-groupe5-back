@@ -1,3 +1,4 @@
+import { IPeriodInfos } from "../../interfaces/general/IPeriodInfos";
 import { JOURS, MOIS } from "./frenchDateNames";
 
 export const getDateXDaysAgo = (daysAgo: number): Date => {
@@ -9,16 +10,10 @@ export const getDateXDaysAgo = (daysAgo: number): Date => {
   return targetDate;
 };
 
-interface periodInfos {
-  start: Date;
-  end: Date;
-  name: string;
-}
-
-export const getDateXDaysAgoDaysInfos = (daysAgo: number): periodInfos[] => {
+export const getDateXDaysAgoDaysInfos = (daysAgo: number): IPeriodInfos[] => {
   const now = new Date();
 
-  const lastXDaysInfos: periodInfos[] = [];
+  const lastXDaysInfos: IPeriodInfos[] = [];
   // daysAgo - 1 to include currentDay
   const oldestDate = new Date(
     now.getTime() - (daysAgo - 1) * 24 * 60 * 60 * 1000
@@ -41,10 +36,10 @@ export const getDateXDaysAgoDaysInfos = (daysAgo: number): periodInfos[] => {
   return lastXDaysInfos;
 };
 
-export const getDateXWeeksAgoInfos = (weeksAgo: number): periodInfos[] => {
+export const getDateXWeeksAgoInfos = (weeksAgo: number): IPeriodInfos[] => {
   const now = new Date();
 
-  const lastXWeeksInfos: periodInfos[] = [];
+  const lastXWeeksInfos: IPeriodInfos[] = [];
 
   // go back X weeks ago
   const oldestDate = new Date(
@@ -91,10 +86,10 @@ export const getDateXWeeksAgoInfos = (weeksAgo: number): periodInfos[] => {
   return lastXWeeksInfos;
 };
 
-export const getDateXMonthsAgoInfos = (monthsAgo: number): periodInfos[] => {
+export const getDateXMonthsAgoInfos = (monthsAgo: number): IPeriodInfos[] => {
   const now = new Date();
 
-  const lastXMonthsInfos: periodInfos[] = [];
+  const lastXMonthsInfos: IPeriodInfos[] = [];
 
   const oldestMonthsAgoDate = new Date(
     now.setMonth(now.getMonth() - (monthsAgo - 1))
