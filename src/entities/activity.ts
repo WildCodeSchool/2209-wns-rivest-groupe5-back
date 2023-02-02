@@ -9,6 +9,7 @@ import {
 import { IActivity } from "../interfaces/entities/IActivity";
 import { ActivityType } from "./activityType";
 import { User } from "./user";
+import { Min } from "class-validator";
 
 @ObjectType()
 @Entity()
@@ -26,6 +27,7 @@ export class Activity implements IActivity {
   activityDate?: Date;
 
   @Field()
+  @Min(0)
   @Column()
   carbonQuantity: number;
 
