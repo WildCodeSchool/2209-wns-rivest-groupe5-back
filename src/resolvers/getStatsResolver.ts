@@ -59,7 +59,7 @@ const getBaseDataForGraphObj = (
 
 const getBaseActivitiesPerActivityTypesObj = (): IObjectActivitiesArray => {
   return {
-    activityTypeName: [],
+    transport: [],
     numeric: [],
     food: [],
     energy: [],
