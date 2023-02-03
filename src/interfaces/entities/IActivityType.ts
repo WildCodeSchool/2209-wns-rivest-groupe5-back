@@ -1,4 +1,12 @@
+import {
+  activityTypeLabel,
+  activityTypeName,
+} from "./ActivityTypesTypesValues";
+
 export interface IActivityType {
   activityTypeId: number;
-  name: string;
+  name: activityTypeName;
+  label: activityTypeLabel;
+  emoji?: string;
+  backgroundColor: string;
 }

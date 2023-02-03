@@ -1,4 +1,8 @@
 import { Field, ObjectType } from "type-graphql";
+import {
+  activityTypeLabel,
+  activityTypeName,
+} from "../../interfaces/entities/ActivityTypesTypesValues";
 import { IGraphDataset } from "../../interfaces/general/IObjectGraphDataset";
 
 @ObjectType()
@@ -7,10 +11,10 @@ export class GraphDataset implements IGraphDataset {
   id: number;
 
   @Field()
-  name: string;
+  name: activityTypeName;
 
   @Field()
-  label: string;
+  label: activityTypeLabel;
 
   @Field()
   emoji: string;
@@ -28,10 +32,10 @@ export class GraphDatasetPie implements IGraphDataset {
   id: number;
 
   @Field()
-  name: string;
+  name: activityTypeName;
 
   @Field()
-  label: string;
+  label: activityTypeLabel;
 
   @Field(() => [String])
   emoji: string[];
