@@ -75,7 +75,7 @@ const distributeActivityPerActivityTypeInObj = (
   activities.forEach((activity) => {
     const activityConverted: IActivity = {
       ...activity,
-      carbonQuantity: parseFloat((activity.carbonQuantity / 1000).toFixed(3)),
+      carbonQuantity: parseFloat((activity.carbonQuantity / 1000).toFixed(2)),
     };
 
     switch (activity.activityType.activityTypeId) {
@@ -321,7 +321,7 @@ export class GetStatsResolver {
       }
     }
 
-    const roundedSums = sums.map((sum) => parseFloat((sum / 1000).toFixed(3)));
+    const roundedSums = sums.map((sum) => parseFloat((sum / 1000).toFixed(2)));
 
     const dataForGraph: IObjectGraphDataset = {
       labels: labels.map((label) => label.toString()),
