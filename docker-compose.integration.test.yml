@@ -34,9 +34,13 @@ services:
             - 5050:5050
         restart: always
         environment:
-            - DB=dbtest
-        env_file:
-            - ./back/.env
+            DB: dbtest
+            JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+            EMAIL_OAUTH_CLIENTID: ${{secrets.EMAIL_OAUTH_CLIENTID}}
+            EMAIL_OAUTH_CLIENT_SECRET: ${{secrets.EMAIL_OAUTH_CLIENT_SECRET}}
+            EMAIL_OAUTH_REFRESH_TOKEN: ${{secrets.EMAIL_OAUTH_REFRESH_TOKEN}}
+            EMAIL_OAUTH_ACCESS_TOKEN: ${{secrets.EMAIL_OAUTH_ACCESS_TOKEN}}
+            EMAIL_USERNAME: ${{secrets.EMAIL_USERNAME}}
         depends_on:
             dbtest:
                 condition: service_healthy
