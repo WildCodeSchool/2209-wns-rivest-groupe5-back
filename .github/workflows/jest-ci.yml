@@ -17,7 +17,7 @@ jobs:
               uses: actions/checkout@v2
             - name: Goto back and run tests
               run: |
-                  sed -i "s/DB_PASSWORD/${{ env.DB_PASSWORD }}/g" docker-compose.integration.test.yml 
+                  sed -i "s/JWT_SECRET_KEY/${{ env.JWT_SECRET_KEY }}/g" docker-compose.integration.test.yml 
                   sed -i "s/EMAIL_OAUTH_CLIENTID/${{ env.EMAIL_OAUTH_CLIENTID }}/g" docker-compose.integration.test.yml 
                   sed -i "s/EMAIL_OAUTH_CLIENT_SECRET/${{ env.EMAIL_OAUTH_CLIENT_SECRET }}/g" docker-compose.integration.test.yml 
                   sed -i "s/EMAIL_OAUTH_REFRESH_TOKEN/${{ env.EMAIL_OAUTH_REFRESH_TOKEN }}/g" docker-compose.integration.test.yml 
