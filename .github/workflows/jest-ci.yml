@@ -10,8 +10,9 @@ jobs:
               uses: actions/checkout@v2
             - name: create env file
               run: |
-                  touch vars.env
-                  echo "JWT_SECRET_KEY=qkdjfhqiudfhviusdfhgiousdhfsuhfgiuosdhfoiudshfog" >> vars.env
+                  cd back/
+                  touch .env
+                  echo "JWT_SECRET_KEY=qkdjfhqiudfhviusdfhgiousdhfsuhfgiuosdhfoiudshfog" >> .env
 
             - name: Goto back and run tests
               run: docker compose -f docker-compose.integration.test.yml up --build --exit-code-from testrunner
