@@ -1,0 +1,66 @@
+services:
+    dbtest:
+        image: postgres
+        restart: always
+        environment:
+            - DATABASE_HOST=127.0.0.1
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=example
+            - POSTGRES_DB=postgres
+        ports:
+            - "5432:5432"
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}",
+                ]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8081:8080
+        depends_on:
+            dbtest:
+                condition: service_healthy
+
+    back:
+        build: ./back
+        ports:
+            - 5050:5050
+        restart: always
+        environment:
+            DB: dbtest
+        env_file:
+            - ./back/.env
+        depends_on:
+            dbtest:
+                condition: service_healthy
+        command: npm run dev
+        volumes:
+            - ./back/src/:/app/src/
+        healthcheck:
+            test: 'curl --fail --request POST --header ''content-type: application/json'' --url ''http://localhost:5050'' --data ''{"query":"query { __typename }"}'' || exit 1'
+            interval: 2s
+            timeout: 16s
+            retries: 8
+            start_period: 2s
+
+    mailhog:
+        image: mailhog/mailhog:latest
+        restart: always
+        ports:
+            - 1025:1025
+            - 8025:8025
+
+    testrunner:
+        build: ./testrunner
+        volumes:
+            - ./testrunner/src/:/app/src/
+        depends_on:
+            back:
+                condition: service_healthy
