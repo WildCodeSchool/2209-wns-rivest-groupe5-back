@@ -14,7 +14,7 @@ jobs:
                   echo "JWT_SECRET_KEY=qkdjfhqiudfhviusdfhgiousdhfsuhfgiuosdhfoiudshfog" >> vars.env
 
             - name: Goto back and run tests
-              run: docker-compose -f docker-compose.integration.test.yml --build --exit-code-from testrunner
+              run: docker compose -f docker-compose.integration.test.yml up --build --exit-code-from testrunner
     # docker:
     #     needs: test-back
     #     if: github.ref == 'refs/heads/dev'
