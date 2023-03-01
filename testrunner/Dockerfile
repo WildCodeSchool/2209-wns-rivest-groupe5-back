@@ -5,6 +5,7 @@ WORKDIR /app
 
 COPY package.json ./
 COPY jest.config.js ./
+COPY setupTests.ts ./
 RUN npm install
 
 COPY tsconfig.json ./
