@@ -35,6 +35,8 @@ services:
         restart: always
         environment:
             DB: dbtest
+        env_file:
+            - ./back/.env
         depends_on:
             dbtest:
                 condition: service_healthy
