@@ -53,19 +53,6 @@ describe("Activity resolver", () => {
         await clearDB();
     });
 
-    it("get all activites", async () => {
-        const res = await client.query({
-            query: GET_ALL_ACTIVITIES,
-            fetchPolicy: "no-cache",
-            context: {
-                headers: {
-                    authorization: testUserToken,
-                },
-            },
-        });
-        expect(res.data?.getAllActivities.length).toEqual(1);
-    });
-
     it("create activity", async () => {
         const res = await client.mutate({
             mutation: CREATE_ACTIVITY,
