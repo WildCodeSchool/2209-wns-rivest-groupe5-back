@@ -53,7 +53,7 @@ export class User implements IUser {
         enum: userVisibility,
         default: userVisibility.private,
     })
-    name: userVisibility;
+    visibility: userVisibility;
 
     @Field(() => [GoodDeal], { nullable: true })
     @OneToMany(() => GoodDeal, (goodDeal) => goodDeal.user, {

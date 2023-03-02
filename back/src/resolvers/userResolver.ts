@@ -156,6 +156,7 @@ export class UserResolver {
         newUser.lastname = lastname;
         newUser.password = await argon2.hash(password.trim());
         newUser.role = USER_ROLES.USER;
+
         const userFromDB = await dataSource.manager.save(User, newUser);
 
         if (process.env.DB !== "dbtest") {
