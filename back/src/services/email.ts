@@ -4,6 +4,7 @@ import htmlToText from "html-to-text";
 import path from "path";
 import { IEmailCreation } from "../interfaces/services/IEmailCreation";
 import { IUser } from "../interfaces/entities/IUser";
+import nodemailerSendgrid from "nodemailer-sendgrid";
 
 export default class Email implements IEmailCreation {
   to: string;
@@ -26,17 +27,15 @@ export default class Email implements IEmailCreation {
 
   newTransport(): nodemailer.Transporter {
     if (process.env.NODE_ENV === "production") {
-      return nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          type: "OAuth2",
-          user: process.env.EMAIL_USERNAME,
-          clientId: process.env.EMAIL_OAUTH_CLIENTID,
-          clientSecret: process.env.EMAIL_OAUTH_CLIENT_SECRET,
-          refreshToken: process.env.EMAIL_OAUTH_REFRESH_TOKEN,
-          accessToken: process.env.EMAIL_OAUTH_ACCESS_TOKEN,
-        },
-      });
+      if (process.env.EMAIL_SENDGRID_API_KEY === undefined) {
+        throw new Error();
+      }
+
+      return nodemailer.createTransport(
+        nodemailerSendgrid({
+          apiKey: process.env.EMAIL_SENDGRID_API_KEY,
+        })
+      );
     } else {
       return nodemailer.createTransport({
         host: "mailhog",
