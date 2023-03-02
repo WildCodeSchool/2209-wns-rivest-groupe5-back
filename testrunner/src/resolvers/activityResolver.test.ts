@@ -15,7 +15,6 @@ import { getTokenForUser } from "./helpers/generate/user/getTokenForUser";
 import client from "./helpers/getClient";
 import { CREATE_ACTIVITY } from "./helpers/graphql/mutations/activity/createActivity";
 import { UPDATE_ACTIVITY } from "./helpers/graphql/mutations/activity/updateActivity";
-import { GET_ALL_ACTIVITIES } from "./helpers/graphql/queries/activity/getAllActivities";
 
 describe("Activity resolver", () => {
     let testUser: ITestUser;
