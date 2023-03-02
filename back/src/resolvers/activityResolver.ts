@@ -13,19 +13,6 @@ import { UpdateActivityInput } from "./inputs/updateActivityInput";
 export class ActivityResolver {
     @Authorized()
     @Query(() => [Activity])
-    async getAllActivities(): Promise<Activity[]> {
-        const allActivities = await dataSource.getRepository(Activity).find({
-            relations: {
-                activityType: true,
-                user: true,
-            },
-        });
-
-        return allActivities;
-    }
-
-    @Authorized()
-    @Query(() => [Activity])
     async getAllMyActivities(@Ctx() ctx: Context): Promise<Activity[]> {
         const userFromCtx = ctx as IUserCtx;
 

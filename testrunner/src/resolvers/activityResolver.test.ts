@@ -15,7 +15,6 @@ import { getTokenForUser } from "./helpers/generate/user/getTokenForUser";
 import client from "./helpers/getClient";
 import { CREATE_ACTIVITY } from "./helpers/graphql/mutations/activity/createActivity";
 import { UPDATE_ACTIVITY } from "./helpers/graphql/mutations/activity/updateActivity";
-import { GET_ALL_ACTIVITIES } from "./helpers/graphql/queries/activity/getAllActivities";
 
 describe("Activity resolver", () => {
     let testUser: ITestUser;
@@ -51,19 +50,6 @@ describe("Activity resolver", () => {
 
     afterAll(async () => {
         await clearDB();
-    });
-
-    it("get all activites", async () => {
-        const res = await client.query({
-            query: GET_ALL_ACTIVITIES,
-            fetchPolicy: "no-cache",
-            context: {
-                headers: {
-                    authorization: testUserToken,
-                },
-            },
-        });
-        expect(res.data?.getAllActivities.length).toEqual(1);
     });
 
     it("create activity", async () => {
