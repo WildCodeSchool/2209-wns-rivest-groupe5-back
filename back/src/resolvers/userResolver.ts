@@ -52,14 +52,14 @@ export class UserResolver {
     ): Promise<LoginResponse> {
         try {
             const userFromDB = await dataSource.manager.findOneByOrFail(User, {
-                email,
+                email: email.toLowerCase().trim(),
             });
 
             if (process.env.JWT_SECRET_KEY === undefined) {
                 throw new Error();
             }
 
-            if (await argon2.verify(userFromDB.password, password)) {
+            if (await argon2.verify(userFromDB.password, password.trim())) {
                 const token = jwt.sign(
                     {
                         email: userFromDB.email,
@@ -79,7 +79,7 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async forgotPassword(@Arg("email") email: string): Promise<boolean> {
         const requestingUser = await dataSource.manager.findOneByOrFail(User, {
-            email,
+            email: email.toLowerCase().trim(),
         });
 
         const resetToken = requestingUser.createPasswordResetToken;
@@ -108,7 +108,7 @@ export class UserResolver {
         @Arg("resetToken") resetToken: string,
         @Arg("password") password: string
     ): Promise<String> {
-        const passwordResetToken = hashSha256(resetToken);
+        const passwordResetToken = hashSha256(resetToken.trim());
 
         const requestingUser = await dataSource.manager.findOneByOrFail(User, {
             passwordResetToken,
@@ -125,7 +125,7 @@ export class UserResolver {
             );
         }
 
-        requestingUser.password = await argon2.hash(password);
+        requestingUser.password = await argon2.hash(password.trim());
         requestingUser.passwordResetToken = "";
         requestingUser.passwordResetExpires = new Date(0);
 
@@ -151,10 +151,10 @@ export class UserResolver {
         @Arg("lastname") lastname: string
     ): Promise<User> {
         const newUser = new User();
-        newUser.email = email;
+        newUser.email = email.toLowerCase().trim();
         newUser.firstname = firstname;
         newUser.lastname = lastname;
-        newUser.password = await argon2.hash(password);
+        newUser.password = await argon2.hash(password.trim());
         newUser.role = USER_ROLES.USER;
         const userFromDB = await dataSource.manager.save(User, newUser);
 
@@ -172,7 +172,7 @@ export class UserResolver {
             throw new Error("No email provided to invite a friend.");
 
         const fictiveUser = new User();
-        fictiveUser.email = email;
+        fictiveUser.email = email.trim();
 
         const registerUrl = `${getFrontendBaseUrl()}/register`;
 
