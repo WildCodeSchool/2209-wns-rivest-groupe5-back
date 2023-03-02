@@ -22,6 +22,7 @@ export interface IUser {
     contributions: Contribution[];
     followings: Following[];
     followers: Following[];
+    visibility: string;
 
     createPasswordResetToken: string;
 }
