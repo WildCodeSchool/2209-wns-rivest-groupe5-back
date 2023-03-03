@@ -16,6 +16,9 @@ import Email from "../services/email";
 import { getFrontendBaseUrl } from "../utils/getBaseUrls";
 import hashSha256 from "../utils/hashSha256";
 import { USER_ROLES } from "../utils/userRoles";
+import { Context } from "apollo-server-core";
+import { IUserCtx } from "../interfaces/general/IUserCtx";
+import { userVisibility } from "../interfaces/entities/UserVisibilityOptions";
 
 @ObjectType()
 class LoginResponse {
@@ -30,10 +33,12 @@ class LoginResponse {
 export class UserResolver {
     @Authorized()
     @Query(() => User)
-    async getMyUserData(@Ctx() context: any): Promise<User> {
+    async getMyUserData(@Ctx() ctx: Context): Promise<User> {
+        const userFromCtx = ctx as IUserCtx;
+
         const myUserData = await dataSource
             .getRepository(User)
-            .findOneByOrFail({ email: context.user.email });
+            .findOneByOrFail({ email: userFromCtx.user.email });
         return myUserData;
     }
 
@@ -182,5 +187,28 @@ export class UserResolver {
         }
 
         return true;
+    }
+
+    @Authorized()
+    @Mutation(() => String)
+    async toggleUserVisibility(@Ctx() ctx: Context): Promise<string> {
+        const userFromCtx = ctx as IUserCtx;
+
+        const userRepository = dataSource.getRepository(User);
+
+        const dbUser = await userRepository.findOneByOrFail({
+            userId: userFromCtx.user.userId,
+        });
+
+        const visibilityNewValue =
+            userFromCtx.user.visibility === userVisibility.private
+                ? userVisibility.public
+                : userVisibility.private;
+
+        dbUser.visibility = visibilityNewValue;
+
+        await userRepository.save(dbUser);
+
+        return visibilityNewValue.toString();
     }
 }
