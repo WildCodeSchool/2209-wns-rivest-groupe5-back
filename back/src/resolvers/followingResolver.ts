@@ -6,6 +6,8 @@ import { Following } from "../entities/userIsFollowing";
 import { IUserCtx } from "../interfaces/general/IUserCtx";
 import dataSource from "../utils/datasource";
 
+console.log("demo");
+
 @Resolver(Following)
 export class FollowingResolver {
     @Authorized()
