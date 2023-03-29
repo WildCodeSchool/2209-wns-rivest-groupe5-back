@@ -5,7 +5,7 @@ services:
         environment:
             - DATABASE_HOST=127.0.0.1
             - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=example
+            - POSTGRES_PASSWORD=azerty
             - POSTGRES_DB=postgres
         ports:
             - "5432:5432"
