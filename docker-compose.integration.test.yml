@@ -64,3 +64,4 @@ services:
         depends_on:
             back:
                 condition: service_healthy
+
