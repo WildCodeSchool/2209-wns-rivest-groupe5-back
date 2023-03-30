@@ -16,11 +16,10 @@ jobs:
               run: |
                   cd back/
                   touch .env
-                  echo "JWT_SECRET_KEY=qkdjfhqiudfhviusdfhgiousdhfsuhfgiuosdhfoiudshfog
-                  POSTGRES_PASSWORD=test"  >> .env
+                  echo "JWT_SECRET_KEY=qkdjfhqiudfhviusdfhgiousdhfsuhfgiuosdhfoiudshfog\nPOSTGRES_PASSWORD=test"  >> .env
 
             - name: Goto back and run tests
-              run: docker compose -f docker-compose.integration.test.yml up --build --exit-code-from testrunner
+              run: docker compose -f docker-compose.integration.test.yml up --build --env-file back/.env --exit-code-from testrunner
     docker:
         needs: test-back
         if: github.ref == 'refs/heads/dev'
