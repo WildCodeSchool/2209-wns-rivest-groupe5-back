@@ -12,7 +12,7 @@ const dataSource = new DataSource({
     host: process.env.DB || "db",
     port: 5432,
     username: "postgres",
-    password: process.env.POSTGRES_PASSWORD || "example",
+    password: process.env.POSTGRES_PASSWORD || "azerty",
     database: "postgres",
     synchronize: true,
     entities: [
