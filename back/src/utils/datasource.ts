@@ -9,10 +9,10 @@ import { Following } from "../entities/userIsFollowing";
 
 const dataSource = new DataSource({
     type: "postgres",
-    host: process.env.DB || "db",
+    host: process.env.GATEWAY_PORT === "8000" ? "dbprod" : "dbdev",
     port: 5432,
     username: "postgres",
-    password: "azerty",
+    password: process.env.POSTGRES_PASSWORD,
     database: "postgres",
     synchronize: true,
     entities: [
