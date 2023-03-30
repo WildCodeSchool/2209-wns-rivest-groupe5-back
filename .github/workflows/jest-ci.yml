@@ -1,10 +1,10 @@
 name: jest-ci
 
 on:
-  push:
-    branches: ['main', 'dev'] 
-  pull_request:
-    branches: ['main', 'dev'] 
+    push:
+        branches: ["main", "dev"]
+    pull_request:
+        branches: ["main", "dev"]
 
 jobs:
     test-back:
@@ -16,7 +16,8 @@ jobs:
               run: |
                   cd back/
                   touch .env
-                  echo "JWT_SECRET_KEY=qkdjfhqiudfhviusdfhgiousdhfsuhfgiuosdhfoiudshfog" >> .env
+                  echo "JWT_SECRET_KEY=qkdjfhqiudfhviusdfhgiousdhfsuhfgiuosdhfoiudshfog
+                  POSTGRES_PASSWORD=test"  >> .env
 
             - name: Goto back and run tests
               run: docker compose -f docker-compose.integration.test.yml up --build --exit-code-from testrunner
