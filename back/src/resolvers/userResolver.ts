@@ -55,17 +55,24 @@ export class UserResolver {
         if (getUserdata.visibility === userVisibility.private) {
             const userFromCtx = ctx as IUserCtx;
 
-            const userIsFollowingTarget = await dataSource
-                .getRepository(Following)
-                .findOneBy({
-                    user: userFromCtx.user.userId,
-                    userFollowed: userId,
-                });
+            if (userFromCtx.user) {
+                const userIsFollowingTarget = await dataSource
+                    .getRepository(Following)
+                    .findOneBy({
+                        user: userFromCtx.user.userId,
+                        userFollowed: userId,
+                    });
 
-            if (!userIsFollowingTarget) {
-                // target user is private and not followed by the current user
-                throw new Error("Cannot access unfollowed private user's data");
+                if (!userIsFollowingTarget) {
+                    // target user is private and not followed by the current user
+                    throw new Error(
+                        "Cannot access unfollowed private user's data"
+                    );
+                }
             }
+
+            // target user is private
+            throw new Error("Cannot access unfollowed private user's data");
         }
 
         return getUserdata;
