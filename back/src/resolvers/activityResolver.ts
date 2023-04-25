@@ -1,5 +1,6 @@
 import { ApolloError, Context } from "apollo-server-core";
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import { MoreThan } from "typeorm";
 import { Activity } from "../entities/activity";
 import { ActivityType } from "../entities/activityType";
 import { User } from "../entities/user";
@@ -8,6 +9,9 @@ import dataSource from "../utils/datasource";
 import { USER_ROLES } from "../utils/userRoles";
 import { CreateActivityInput } from "./inputs/createActivityInput";
 import { UpdateActivityInput } from "./inputs/updateActivityInput";
+import { Following } from "../entities/userIsFollowing";
+import { getDateXDaysAgo } from "../utils/dates/datesUtils";
+import { IObj } from "../interfaces/general/IObject";
 
 @Resolver(Activity)
 export class ActivityResolver {
@@ -128,5 +132,61 @@ export class ActivityResolver {
             .findOneByOrFail({ activityId });
 
         return activity;
+    }
+
+    @Authorized()
+    @Query(() => [Activity])
+    async getAllUsersFollowedLastSevenDaysActivities(
+        @Ctx() ctx: Context
+    ): Promise<Activity[]> {
+        const userFromCtx = ctx as IUserCtx;
+
+        const followedUsers = await dataSource.getRepository(Following).find({
+            where: { user: userFromCtx.user.userId },
+            select: {
+                userFollowed: true,
+            },
+        });
+        const followedUserIds = followedUsers.map(
+            (follow: IObj) => follow.userFollowed
+        );
+
+        const targetDate = getDateXDaysAgo(7);
+        let allUsersActivities: Activity[] = [];
+
+        for await (const userId of followedUserIds) {
+            const userLastActivities: Activity[] = await dataSource
+                .getRepository(Activity)
+                .find({
+                    relations: {
+                        activityType: true,
+                        user: true,
+                    },
+                    where: {
+                        user: {
+                            userId: userId,
+                        },
+                        createdAt: MoreThan(targetDate),
+                    },
+                    select: {
+                        user: {
+                            userId: true,
+                            firstname: true,
+                            lastname: true,
+                            email: true,
+                            avatar: true,
+                        },
+                    },
+                });
+
+            allUsersActivities = allUsersActivities.concat(userLastActivities);
+        }
+
+        // order all activities from most recent to oldest
+        allUsersActivities.sort(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+        );
+
+        return allUsersActivities;
     }
 }
