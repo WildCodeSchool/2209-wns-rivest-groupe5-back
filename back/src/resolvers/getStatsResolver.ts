@@ -165,7 +165,6 @@ export class GetStatsResolver {
         return dataForGraph;
     }
 
-    @Authorized()
     @Query(() => ObjectGraphDataset)
     async getPublicOrFollowedUserLastWeekActivities(
         @Ctx() ctx: Context,
@@ -178,17 +177,23 @@ export class GetStatsResolver {
         if (targetUser.visibility === userVisibility.private) {
             const userFromCtx = ctx as IUserCtx;
 
-            const userIsFollowingTarget = await dataSource
-                .getRepository(Following)
-                .findOneBy({
-                    user: userFromCtx.user.userId,
-                    userFollowed: userIdToGetStats,
-                });
+            if (userFromCtx.user) {
+                const userIsFollowingTarget = await dataSource
+                    .getRepository(Following)
+                    .findOneBy({
+                        user: userFromCtx.user.userId,
+                        userFollowed: userIdToGetStats,
+                    });
 
-            if (!userIsFollowingTarget) {
-                // target user is private and not followed by the current user
-                throw new Error("Cannot access unfollowed private user's data");
+                if (!userIsFollowingTarget) {
+                    // target user is private and not followed by the current user
+                    throw new Error(
+                        "Cannot access unfollowed private user's data"
+                    );
+                }
             }
+
+            throw new Error("Cannot access unfollowed private user's data");
         }
 
         const lastDaysInfos = getDateXDaysAgoDaysInfos(7);
@@ -425,7 +430,6 @@ export class GetStatsResolver {
         return dataForGraph;
     }
 
-    @Authorized()
     @Query(() => ObjectGraphDatasetPie)
     async getPublicOrFollowedUserTotalCarbonPerActivityType(
         @Ctx() ctx: Context,
@@ -438,17 +442,24 @@ export class GetStatsResolver {
         if (targetUser.visibility === userVisibility.private) {
             const userFromCtx = ctx as IUserCtx;
 
-            const userIsFollowingTarget = await dataSource
-                .getRepository(Following)
-                .findOneBy({
-                    user: userFromCtx.user.userId,
-                    userFollowed: userIdToGetStats,
-                });
+            if (userFromCtx.user) {
+                const userIsFollowingTarget = await dataSource
+                    .getRepository(Following)
+                    .findOneBy({
+                        user: userFromCtx.user.userId,
+                        userFollowed: userIdToGetStats,
+                    });
 
-            if (!userIsFollowingTarget) {
-                // target user is private and not followed by the current user
-                throw new Error("Cannot access unfollowed private user's data");
+                if (!userIsFollowingTarget) {
+                    // target user is private and not followed by the current user
+                    throw new Error(
+                        "Cannot access unfollowed private user's data"
+                    );
+                }
             }
+
+            // target user is private
+            throw new Error("Cannot access unfollowed private user's data");
         }
 
         const allActivitiesOfTheUser = await dataSource

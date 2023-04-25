@@ -12,6 +12,7 @@ import { UpdateActivityInput } from "./inputs/updateActivityInput";
 import { Following } from "../entities/userIsFollowing";
 import { getDateXDaysAgo } from "../utils/dates/datesUtils";
 import { IObj } from "../interfaces/general/IObject";
+import { userVisibility } from "../interfaces/entities/UserVisibilityOptions";
 
 @Resolver(Activity)
 export class ActivityResolver {
@@ -188,5 +189,70 @@ export class ActivityResolver {
         );
 
         return allUsersActivities;
+    }
+
+    @Query(() => [Activity])
+    async getPublicOrFollowedUserLastSevenDaysActivities(
+        @Ctx() ctx: Context,
+        @Arg("userId") userId: number
+    ): Promise<Activity[]> {
+        const targetUser = await dataSource
+            .getRepository(User)
+            .findOneByOrFail({ userId });
+
+        if (targetUser.visibility === userVisibility.private) {
+            const userFromCtx = ctx as IUserCtx;
+
+            if (userFromCtx.user) {
+                const userIsFollowingTarget = await dataSource
+                    .getRepository(Following)
+                    .findOneBy({
+                        user: userFromCtx.user.userId,
+                        userFollowed: userId,
+                    });
+
+                if (!userIsFollowingTarget) {
+                    // target user is private and not followed by the current user
+                    throw new Error(
+                        "Cannot access unfollowed private user's data"
+                    );
+                }
+            }
+            throw new Error("Cannot access unfollowed private user's data");
+        }
+
+        // target user is private
+        const targetDate = getDateXDaysAgo(7);
+
+        const userLastActivities: Activity[] = await dataSource
+            .getRepository(Activity)
+            .find({
+                relations: {
+                    activityType: true,
+                    user: true,
+                },
+                where: {
+                    user: {
+                        userId: userId,
+                    },
+                    createdAt: MoreThan(targetDate),
+                },
+                select: {
+                    user: {
+                        userId: true,
+                        firstname: true,
+                        lastname: true,
+                        email: true,
+                        avatar: true,
+                    },
+                },
+            });
+
+        // order all activities from most recent to oldest
+        userLastActivities.sort(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+        );
+
+        return userLastActivities;
     }
 }
