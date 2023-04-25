@@ -63,6 +63,7 @@ export class UserResolver {
                 });
 
             if (!userIsFollowingTarget) {
+                // target user is private and not followed by the current user
                 throw new Error("Cannot access unfollowed private user's data");
             }
         }
