@@ -19,6 +19,7 @@ import { USER_ROLES } from "../utils/userRoles";
 import { Context } from "apollo-server-core";
 import { IUserCtx } from "../interfaces/general/IUserCtx";
 import { userVisibility } from "../interfaces/entities/UserVisibilityOptions";
+import { Following } from "../entities/userIsFollowing";
 
 @ObjectType()
 class LoginResponse {
@@ -43,10 +44,29 @@ export class UserResolver {
     }
 
     @Query(() => User)
-    async getUserById(@Arg("userId") userId: number): Promise<User> {
-        const getUserdata = await dataSource
+    async getUserById(
+        @Ctx() ctx: Context,
+        @Arg("userId") userId: number
+    ): Promise<User> {
+        const getUserdata: User = await dataSource
             .getRepository(User)
             .findOneByOrFail({ userId });
+
+        if (getUserdata.visibility === userVisibility.private) {
+            const userFromCtx = ctx as IUserCtx;
+
+            const userIsFollowingTarget = await dataSource
+                .getRepository(Following)
+                .findOneBy({
+                    user: userFromCtx.user.userId,
+                    userFollowed: userId,
+                });
+
+            if (!userIsFollowingTarget) {
+                throw new Error("Cannot access unfollowed private user's data");
+            }
+        }
+
         return getUserdata;
     }
 
