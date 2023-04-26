@@ -20,6 +20,7 @@ import { Context } from "apollo-server-core";
 import { IUserCtx } from "../interfaces/general/IUserCtx";
 import { userVisibility } from "../interfaces/entities/UserVisibilityOptions";
 import { Following } from "../entities/userIsFollowing";
+import { IUser } from "../interfaces/entities/IUser";
 
 @ObjectType()
 class LoginResponse {
@@ -238,5 +239,28 @@ export class UserResolver {
         await userRepository.save(dbUser);
 
         return visibilityNewValue.toString();
+    }
+
+    @Authorized()
+    @Mutation(() => User)
+    async updateMyUserInformations(
+        @Ctx() ctx: Context,
+        @Arg("firstname") firstname: string,
+        @Arg("lastname") lastname: string
+    ): Promise<User> {
+        const userFromCtx = ctx as IUserCtx;
+
+        const userRepository = dataSource.getRepository(User);
+
+        const dbUser: IUser = await userRepository.findOneByOrFail({
+            userId: userFromCtx.user.userId,
+        });
+
+        dbUser.firstname = firstname.trim();
+        dbUser.lastname = lastname.trim();
+
+        const updatedUser = await userRepository.save(dbUser);
+
+        return updatedUser;
     }
 }
