@@ -21,6 +21,7 @@ import { IUserCtx } from "../interfaces/general/IUserCtx";
 import { userVisibility } from "../interfaces/entities/UserVisibilityOptions";
 import { Following } from "../entities/userIsFollowing";
 import { IUser } from "../interfaces/entities/IUser";
+import { ILike } from "typeorm";
 
 @ObjectType()
 class LoginResponse {
@@ -108,6 +109,34 @@ export class UserResolver {
             console.log(err);
             throw new Error("Invalid Auth");
         }
+    }
+
+    @Authorized()
+    @Query(() => [User])
+    async searchPublicUsers(
+        @Arg("firstname", { nullable: true, defaultValue: undefined })
+        firstname: string,
+        @Arg("lastname", { nullable: true, defaultValue: undefined })
+        lastname: string,
+        @Arg("email", { nullable: true, defaultValue: undefined }) email: string
+    ): Promise<User[]> {
+        const where: any = { visibility: userVisibility.public };
+
+        if (firstname !== undefined && firstname !== null) {
+            where.firstname = ILike(`%${firstname}%`);
+        }
+
+        if (lastname !== undefined && lastname !== null) {
+            where.lastname = ILike(`%${lastname}%`);
+        }
+
+        if (email !== undefined && email !== null) {
+            where.email = ILike(`%${email}%`);
+        }
+
+        const users = await dataSource.getRepository(User).find({ where });
+
+        return users;
     }
 
     @Mutation(() => Boolean)
