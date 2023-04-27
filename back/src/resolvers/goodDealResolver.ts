@@ -1,22 +1,47 @@
 import { Context } from "apollo-server-core";
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  Mutation,
+  Query,
+  Resolver,
+  registerEnumType,
+} from 'type-graphql';
 import { GoodDeal } from "../entities/goodDeal";
 import { User } from "../entities/user";
 import { IUserCtx } from "../interfaces/general/IUserCtx";
 import dataSource from "../utils/datasource";
 import { CreateGoodDealInput } from "./inputs/createGoodDealInput";
 
+export enum FindOptionsOrderValue {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
+registerEnumType(FindOptionsOrderValue, {
+  name: 'FindOptionsOrderValue',
+});
+
 @Resolver(GoodDeal)
 export class GoodDealResolver {
   @Query(() => [GoodDeal])
-  async getAllGoodDeals(): Promise<GoodDeal[]> {
+  async getAllGoodDeals(
+    @Arg('limit', {nullable: true, defaultValue: undefined}) limit: number = 0,
+    @Arg('order', () => FindOptionsOrderValue, { nullable: true, defaultValue: undefined })
+    order: FindOptionsOrderValue = FindOptionsOrderValue.ASC,
+  ): Promise<GoodDeal[]> {
     const allGoodDeals = await dataSource.getRepository(GoodDeal).find({
+      order: {
+        goodDealId: order,
+      },
       relations: {
         goodDealVotes: {
           user: true,
         },
         user: true,
       },
+      take: limit,
     });
 
     return allGoodDeals;
@@ -29,7 +54,7 @@ export class GoodDealResolver {
 
     const allGoodDeals = await dataSource.getRepository(GoodDeal).find({
       relations: {
-        goodDealVotes: { user: true },
+        goodDealVotes: {user: true},
         user: true,
       },
       where: {
@@ -46,7 +71,7 @@ export class GoodDealResolver {
   @Mutation(() => GoodDeal)
   async createGoodDeal(
     @Ctx() ctx: Context,
-    @Arg("data") createGoodDeal: CreateGoodDealInput
+    @Arg('data') createGoodDeal: CreateGoodDealInput,
   ): Promise<GoodDeal> {
     const userFromCtx = ctx as IUserCtx;
 
