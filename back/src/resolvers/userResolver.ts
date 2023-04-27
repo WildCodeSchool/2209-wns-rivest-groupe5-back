@@ -21,6 +21,7 @@ import { IUserCtx } from "../interfaces/general/IUserCtx";
 import { userVisibility } from "../interfaces/entities/UserVisibilityOptions";
 import { Following } from "../entities/userIsFollowing";
 import { IUser } from "../interfaces/entities/IUser";
+import { ILike, getRepository, SelectQueryBuilder } from "typeorm";
 
 @ObjectType()
 class LoginResponse {
@@ -108,6 +109,79 @@ export class UserResolver {
             console.log(err);
             throw new Error("Invalid Auth");
         }
+    }
+
+    @Authorized()
+    @Query(() => [User])
+    async searchPublicUsers(
+        @Arg("searchString") searchString: string
+    ): Promise<User[]> {
+        const searchTerms = searchString.split(" ");
+        const queryBuilder = await dataSource
+            .getRepository(User)
+            .createQueryBuilder("user");
+
+        let query: SelectQueryBuilder<User> = queryBuilder.where(
+            "user.visibility = :visibility",
+            { visibility: userVisibility.public }
+        );
+
+        // Check if searchString matches email pattern
+        const emailRegex = /^\S+@\S+\.\S+$/;
+        const isEmailPattern = emailRegex.test(searchString);
+
+        // if one term and not an email pattern, search firstname and lastname using LIKE operator
+        if (searchTerms.length === 1 && !isEmailPattern) {
+            const searchTerm = searchTerms[0];
+            query = queryBuilder
+                .where(
+                    "user.firstname ILIKE :term AND user.visibility = :visibility",
+                    {
+                        term: `%${searchTerm}%`,
+                        visibility: userVisibility.public,
+                    }
+                )
+                .orWhere(
+                    "user.lastname ILIKE :term AND user.visibility = :visibility",
+                    {
+                        term: `%${searchTerm}%`,
+                        visibility: userVisibility.public,
+                    }
+                );
+        } else if (searchTerms.length === 1 && isEmailPattern) {
+            // if one term and an email pattern, search for exact email matches only
+            const searchTerm = searchTerms[0];
+            query = queryBuilder.where(
+                "user.email = :term AND user.visibility = :visibility",
+                {
+                    term: `${searchTerm}`,
+                    visibility: userVisibility.public,
+                }
+            );
+        } else {
+            // if more than 1 search term and is not an email, we assume the first 2 terms are firstname or lastname, others are ignored
+            const [firstName, lastName] = searchTerms;
+            query = queryBuilder
+                .where(
+                    "user.firstname ILIKE :firstName AND user.lastname ILIKE :lastName AND user.visibility = :visibility",
+                    {
+                        firstName: `%${firstName}%`,
+                        lastName: `%${lastName}%`,
+                        visibility: userVisibility.public,
+                    }
+                )
+                .orWhere(
+                    "user.lastname ILIKE :firstName AND user.firstname ILIKE :lastName AND user.visibility = :visibility",
+                    {
+                        firstName: `%${firstName}%`,
+                        lastName: `%${lastName}%`,
+                        visibility: userVisibility.public,
+                    }
+                );
+        }
+
+        const users = await query.getMany();
+        return users;
     }
 
     @Mutation(() => Boolean)
