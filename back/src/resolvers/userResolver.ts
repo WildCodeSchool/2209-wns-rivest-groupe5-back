@@ -21,7 +21,7 @@ import { IUserCtx } from "../interfaces/general/IUserCtx";
 import { userVisibility } from "../interfaces/entities/UserVisibilityOptions";
 import { Following } from "../entities/userIsFollowing";
 import { IUser } from "../interfaces/entities/IUser";
-import { ILike } from "typeorm";
+import { ILike, getRepository, SelectQueryBuilder } from "typeorm";
 
 @ObjectType()
 class LoginResponse {
@@ -114,28 +114,91 @@ export class UserResolver {
     @Authorized()
     @Query(() => [User])
     async searchPublicUsers(
-        @Arg("firstname", { nullable: true, defaultValue: undefined })
-        firstname: string,
-        @Arg("lastname", { nullable: true, defaultValue: undefined })
-        lastname: string,
-        @Arg("email", { nullable: true, defaultValue: undefined }) email: string
+        @Arg("searchString") searchString: string
     ): Promise<User[]> {
-        const where: any = { visibility: userVisibility.public };
+        const searchTerms = searchString.split(" ");
+        const queryBuilder = await dataSource
+            .getRepository(User)
+            .createQueryBuilder("user");
 
-        if (firstname !== undefined && firstname !== null) {
-            where.firstname = ILike(`%${firstname}%`);
+        let query: SelectQueryBuilder<User> = queryBuilder.where(
+            "user.visibility = :visibility",
+            { visibility: userVisibility.public }
+        );
+
+        // if one term, means the user is searching firstname, lastname or email
+        if (searchTerms.length === 1) {
+            const searchTerm = searchTerms[0];
+            query = queryBuilder
+                .where(
+                    "user.firstname ILIKE :term AND user.visibility = :visibility",
+                    {
+                        term: `%${searchTerm}%`,
+                        visibility: userVisibility.public,
+                    }
+                )
+                .orWhere(
+                    "user.lastname ILIKE :term AND user.visibility = :visibility",
+                    {
+                        term: `%${searchTerm}%`,
+                        visibility: userVisibility.public,
+                    }
+                )
+                .orWhere(
+                    "user.email ILIKE :term AND user.visibility = :visibility",
+                    {
+                        term: `%${searchTerm}%`,
+                        visibility: userVisibility.public,
+                    }
+                );
+
+            // if multiple terms, user is searching firstname lastname in reversable order
+        } else if (searchTerms.length === 2) {
+            const [firstName, lastName] = searchTerms;
+            query = queryBuilder
+                .where(
+                    "user.firstname ILIKE :firstName AND user.lastname ILIKE :lastName AND user.visibility = :visibility",
+                    {
+                        firstName: `%${firstName}%`,
+                        lastName: `%${lastName}%`,
+                        visibility: userVisibility.public,
+                    }
+                )
+                .orWhere(
+                    "user.lastname ILIKE :firstName AND user.firstname ILIKE :lastName AND user.visibility = :visibility",
+                    {
+                        firstName: `%${firstName}%`,
+                        lastName: `%${lastName}%`,
+                        visibility: userVisibility.public,
+                    }
+                );
+        } else {
+            // handle the case where there are more than 2 search terms : search in firstname lastname and email
+            for (let i = 0; i < searchTerms.length; i++) {
+                const term = searchTerms[i];
+                // if first term, it is a where clause. For all next ones, it is a orWhere
+                const clause = i === 0 ? query.where : query.orWhere;
+                clause
+                    .call(
+                        query,
+                        "user.firstname ILIKE :term AND user.visibility = :visibility",
+                        {
+                            term: `%${term}%`,
+                            visibility: userVisibility.public,
+                        }
+                    )
+                    .orWhere(
+                        "user.lastname ILIKE :term AND user.visibility = :visibility",
+                        { term: `%${term}%`, visibility: userVisibility.public }
+                    )
+                    .orWhere(
+                        "user.email ILIKE :term AND user.visibility = :visibility",
+                        { term: `%${term}%`, visibility: userVisibility.public }
+                    );
+            }
         }
 
-        if (lastname !== undefined && lastname !== null) {
-            where.lastname = ILike(`%${lastname}%`);
-        }
-
-        if (email !== undefined && email !== null) {
-            where.email = ILike(`%${email}%`);
-        }
-
-        const users = await dataSource.getRepository(User).find({ where });
-
+        const users = await query.getMany();
         return users;
     }
 
