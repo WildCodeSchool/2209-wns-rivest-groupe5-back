@@ -20,6 +20,7 @@ import { Context } from "apollo-server-core";
 import { IUserCtx } from "../interfaces/general/IUserCtx";
 import { userVisibility } from "../interfaces/entities/UserVisibilityOptions";
 import { Following } from "../entities/userIsFollowing";
+import { IUser } from "../interfaces/entities/IUser";
 
 @ObjectType()
 class LoginResponse {
@@ -55,17 +56,24 @@ export class UserResolver {
         if (getUserdata.visibility === userVisibility.private) {
             const userFromCtx = ctx as IUserCtx;
 
-            const userIsFollowingTarget = await dataSource
-                .getRepository(Following)
-                .findOneBy({
-                    user: userFromCtx.user.userId,
-                    userFollowed: userId,
-                });
+            if (userFromCtx.user) {
+                const userIsFollowingTarget = await dataSource
+                    .getRepository(Following)
+                    .findOneBy({
+                        user: userFromCtx.user.userId,
+                        userFollowed: userId,
+                    });
 
-            if (!userIsFollowingTarget) {
-                // target user is private and not followed by the current user
-                throw new Error("Cannot access unfollowed private user's data");
+                if (!userIsFollowingTarget) {
+                    // target user is private and not followed by the current user
+                    throw new Error(
+                        "Cannot access unfollowed private user's data"
+                    );
+                }
             }
+
+            // target user is private
+            throw new Error("Cannot access unfollowed private user's data");
         }
 
         return getUserdata;
@@ -231,5 +239,28 @@ export class UserResolver {
         await userRepository.save(dbUser);
 
         return visibilityNewValue.toString();
+    }
+
+    @Authorized()
+    @Mutation(() => User)
+    async updateMyUserInformations(
+        @Ctx() ctx: Context,
+        @Arg("firstname") firstname: string,
+        @Arg("lastname") lastname: string
+    ): Promise<User> {
+        const userFromCtx = ctx as IUserCtx;
+
+        const userRepository = dataSource.getRepository(User);
+
+        const dbUser: IUser = await userRepository.findOneByOrFail({
+            userId: userFromCtx.user.userId,
+        });
+
+        dbUser.firstname = firstname.trim();
+        dbUser.lastname = lastname.trim();
+
+        const updatedUser = await userRepository.save(dbUser);
+
+        return updatedUser;
     }
 }

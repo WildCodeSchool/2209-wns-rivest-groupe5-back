@@ -4,6 +4,7 @@ import { GoodDeal } from "../../entities/goodDeal";
 import { GoodDealVote } from "../../entities/gooDealVote";
 import { Following } from "../../entities/userIsFollowing";
 import { USER_ROLES } from "../../utils/userRoles";
+import { userVisibility } from "./UserVisibilityOptions";
 
 export interface IUser {
     userId: number;
@@ -22,7 +23,7 @@ export interface IUser {
     contributions: Contribution[];
     followings: Following[];
     followers: Following[];
-    visibility: string;
+    visibility: userVisibility;
 
     createPasswordResetToken: string;
 }
