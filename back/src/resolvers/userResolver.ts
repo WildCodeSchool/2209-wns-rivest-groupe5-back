@@ -126,8 +126,12 @@ export class UserResolver {
             { visibility: userVisibility.public }
         );
 
-        // if one term, means the user is searching firstname, lastname or email
-        if (searchTerms.length === 1) {
+        // Check if searchString matches email pattern
+        const emailRegex = /^\S+@\S+\.\S+$/;
+        const isEmailPattern = emailRegex.test(searchString);
+
+        // if one term and not an email pattern, search firstname and lastname using LIKE operator
+        if (searchTerms.length === 1 && !isEmailPattern) {
             const searchTerm = searchTerms[0];
             query = queryBuilder
                 .where(
@@ -143,17 +147,19 @@ export class UserResolver {
                         term: `%${searchTerm}%`,
                         visibility: userVisibility.public,
                     }
-                )
-                .orWhere(
-                    "user.email ILIKE :term AND user.visibility = :visibility",
-                    {
-                        term: `%${searchTerm}%`,
-                        visibility: userVisibility.public,
-                    }
                 );
-
-            // if multiple terms, user is searching firstname lastname in reversable order
-        } else if (searchTerms.length === 2) {
+        } else if (searchTerms.length === 1 && isEmailPattern) {
+            // if one term and an email pattern, search for exact email matches only
+            const searchTerm = searchTerms[0];
+            query = queryBuilder.where(
+                "user.email = :term AND user.visibility = :visibility",
+                {
+                    term: `${searchTerm}`,
+                    visibility: userVisibility.public,
+                }
+            );
+        } else {
+            // if more than 1 search term and is not an email, we assume the first 2 terms are firstname or lastname, others are ignored
             const [firstName, lastName] = searchTerms;
             query = queryBuilder
                 .where(
@@ -172,30 +178,6 @@ export class UserResolver {
                         visibility: userVisibility.public,
                     }
                 );
-        } else {
-            // handle the case where there are more than 2 search terms : search in firstname lastname and email
-            for (let i = 0; i < searchTerms.length; i++) {
-                const term = searchTerms[i];
-                // if first term, it is a where clause. For all next ones, it is a orWhere
-                const clause = i === 0 ? query.where : query.orWhere;
-                clause
-                    .call(
-                        query,
-                        "user.firstname ILIKE :term AND user.visibility = :visibility",
-                        {
-                            term: `%${term}%`,
-                            visibility: userVisibility.public,
-                        }
-                    )
-                    .orWhere(
-                        "user.lastname ILIKE :term AND user.visibility = :visibility",
-                        { term: `%${term}%`, visibility: userVisibility.public }
-                    )
-                    .orWhere(
-                        "user.email ILIKE :term AND user.visibility = :visibility",
-                        { term: `%${term}%`, visibility: userVisibility.public }
-                    );
-            }
         }
 
         const users = await query.getMany();
