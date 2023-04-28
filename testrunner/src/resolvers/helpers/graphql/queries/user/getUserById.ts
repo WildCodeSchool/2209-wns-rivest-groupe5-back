@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core'
 
 export const GET_USER_BY_ID = gql`
   query GetUserById($userId: Float!) {
@@ -6,4 +6,4 @@ export const GET_USER_BY_ID = gql`
       email
     }
   }
-`;
+`

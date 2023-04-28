@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core'
 
 export const GET_MY_USER_DATA = gql`
   query Query {
@@ -6,4 +6,4 @@ export const GET_MY_USER_DATA = gql`
       email
     }
   }
-`;
+`

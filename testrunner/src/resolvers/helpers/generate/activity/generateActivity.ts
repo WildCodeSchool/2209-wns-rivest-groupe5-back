@@ -1,6 +1,6 @@
-import { ITestActivity } from "src/interfaces/entitites/testActivityInterface";
-import client from "../../getClient";
-import { CREATE_ACTIVITY } from "../../graphql/mutations/activity/createActivity";
+import { ITestActivity } from 'src/interfaces/entitites/testActivityInterface'
+import client from '../../getClient'
+import { CREATE_ACTIVITY } from '../../graphql/mutations/activity/createActivity'
 
 export const generateTestActivity = async (
   activityTypeId: number,
@@ -10,19 +10,19 @@ export const generateTestActivity = async (
     mutation: CREATE_ACTIVITY,
     variables: {
       data: {
-        title: "test activity",
+        title: 'test activity',
         activityTypeId,
-        description: "This is a test activity",
+        description: 'This is a test activity',
         carbonQuantity: 10,
       },
     },
-    fetchPolicy: "no-cache",
+    fetchPolicy: 'no-cache',
     context: {
       headers: {
         authorization: userToken,
       },
     },
-  });
+  })
 
-  return res.data.createActivity;
-};
+  return res.data.createActivity
+}

@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client/core";
-import client from "../../getClient";
+import { gql } from '@apollo/client/core'
+import client from '../../getClient'
 
 export const getTokenForUser = async (
   password: string,
@@ -20,8 +20,8 @@ export const getTokenForUser = async (
       }
     `,
     variables: { password, email },
-    fetchPolicy: "no-cache",
-  });
+    fetchPolicy: 'no-cache',
+  })
 
-  return res.data.getToken.token;
-};
+  return res.data.getToken.token
+}
