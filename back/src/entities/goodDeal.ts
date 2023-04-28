@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, ObjectType } from 'type-graphql'
 import {
   Column,
   CreateDateColumn,
@@ -7,45 +7,45 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-} from "typeorm";
-import { IGoodDeal } from "../interfaces/entities/IGoodDeal";
-import { GoodDealVote } from "./gooDealVote";
-import { User } from "./user";
+} from 'typeorm'
+import { IGoodDeal } from '../interfaces/entities/IGoodDeal'
+import { GoodDealVote } from './gooDealVote'
+import { User } from './user'
 
 @ObjectType()
 @Entity()
 export class GoodDeal implements IGoodDeal {
   @Field()
   @PrimaryGeneratedColumn()
-  goodDealId: number;
+  goodDealId: number
 
   @Field()
   @Column()
-  goodDealTitle: string;
+  goodDealTitle: string
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  goodDealLink?: string;
+  goodDealLink?: string
 
   @Field()
   @Column()
-  goodDealContent: string;
+  goodDealContent: string
 
   @Field(() => [GoodDealVote], { nullable: true })
   @OneToMany(() => GoodDealVote, (goodDealVote) => goodDealVote.goodDeal, {
     cascade: true,
   })
-  goodDealVotes: GoodDealVote[];
+  goodDealVotes: GoodDealVote[]
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  image?: string;
+  image?: string
 
   @Field()
-  @CreateDateColumn({ name: "createdAt" })
-  createdAt: Date;
+  @CreateDateColumn({ name: 'createdAt' })
+  createdAt: Date
 
   @Field(() => User, { nullable: false })
   @ManyToOne(() => User, (user) => user.goodDeals)
-  user: User;
+  user: User
 }

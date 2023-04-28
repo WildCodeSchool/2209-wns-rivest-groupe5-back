@@ -1,23 +1,23 @@
-import { InputType, Field } from "type-graphql";
+import { InputType, Field } from 'type-graphql'
 import {
   activityTypeLabel,
   activityTypeName,
-} from "../../interfaces/entities/ActivityTypesTypesValues";
+} from '../../interfaces/entities/ActivityTypesTypesValues'
 
-@InputType({ description: "Create activity type data" })
+@InputType({ description: 'Create activity type data' })
 export class CreateActivityTypeInput {
   @Field(() => Number)
-  activityTypeId: number;
+  activityTypeId: number
 
   @Field(() => String)
-  name: activityTypeName;
+  name: activityTypeName
 
   @Field(() => String)
-  label: activityTypeLabel;
+  label: activityTypeLabel
 
   @Field(() => String, { nullable: true })
-  emoji?: string;
+  emoji?: string
 
   @Field(() => String)
-  backgroundColor: string;
+  backgroundColor: string
 }
