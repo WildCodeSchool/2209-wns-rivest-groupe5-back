@@ -1,4 +1,4 @@
-import { Context } from "apollo-server-core";
+import { Context } from 'apollo-server-core'
 import {
   Arg,
   Authorized,
@@ -7,12 +7,12 @@ import {
   Query,
   Resolver,
   registerEnumType,
-} from 'type-graphql';
-import { GoodDeal } from "../entities/goodDeal";
-import { User } from "../entities/user";
-import { IUserCtx } from "../interfaces/general/IUserCtx";
-import dataSource from "../utils/datasource";
-import { CreateGoodDealInput } from "./inputs/createGoodDealInput";
+} from 'type-graphql'
+import { GoodDeal } from '../entities/goodDeal'
+import { User } from '../entities/user'
+import { IUserCtx } from '../interfaces/general/IUserCtx'
+import dataSource from '../utils/datasource'
+import { CreateGoodDealInput } from './inputs/createGoodDealInput'
 
 export enum FindOptionsOrderValue {
   ASC = 'ASC',
@@ -21,15 +21,19 @@ export enum FindOptionsOrderValue {
 
 registerEnumType(FindOptionsOrderValue, {
   name: 'FindOptionsOrderValue',
-});
+})
 
 @Resolver(GoodDeal)
 export class GoodDealResolver {
   @Query(() => [GoodDeal])
   async getAllGoodDeals(
-    @Arg('limit', {nullable: true, defaultValue: undefined}) limit: number = 0,
-    @Arg('order', () => FindOptionsOrderValue, { nullable: true, defaultValue: undefined })
-    order: FindOptionsOrderValue = FindOptionsOrderValue.ASC,
+    @Arg('limit', { nullable: true, defaultValue: undefined })
+    limit: number = 0,
+    @Arg('order', () => FindOptionsOrderValue, {
+      nullable: true,
+      defaultValue: undefined,
+    })
+    order: FindOptionsOrderValue = FindOptionsOrderValue.ASC
   ): Promise<GoodDeal[]> {
     const allGoodDeals = await dataSource.getRepository(GoodDeal).find({
       order: {
@@ -42,19 +46,19 @@ export class GoodDealResolver {
         user: true,
       },
       take: limit,
-    });
+    })
 
-    return allGoodDeals;
+    return allGoodDeals
   }
 
   @Authorized()
   @Query(() => [GoodDeal])
   async getAllMyGoodDeals(@Ctx() ctx: Context): Promise<GoodDeal[]> {
-    const userFromCtx = ctx as IUserCtx;
+    const userFromCtx = ctx as IUserCtx
 
     const allGoodDeals = await dataSource.getRepository(GoodDeal).find({
       relations: {
-        goodDealVotes: {user: true},
+        goodDealVotes: { user: true },
         user: true,
       },
       where: {
@@ -62,29 +66,29 @@ export class GoodDealResolver {
           userId: userFromCtx.user.userId,
         },
       },
-    });
+    })
 
-    return allGoodDeals;
+    return allGoodDeals
   }
 
   @Authorized()
   @Mutation(() => GoodDeal)
   async createGoodDeal(
     @Ctx() ctx: Context,
-    @Arg('data') createGoodDeal: CreateGoodDealInput,
+    @Arg('data') createGoodDeal: CreateGoodDealInput
   ): Promise<GoodDeal> {
-    const userFromCtx = ctx as IUserCtx;
+    const userFromCtx = ctx as IUserCtx
 
-    const newGoodDeal = new GoodDeal();
-    newGoodDeal.goodDealTitle = createGoodDeal.goodDealTitle;
-    newGoodDeal.goodDealLink = createGoodDeal.goodDealLink;
-    newGoodDeal.goodDealContent = createGoodDeal.goodDealContent;
-    newGoodDeal.image = createGoodDeal.image;
-    newGoodDeal.user = userFromCtx.user as User;
-    newGoodDeal.createdAt = new Date();
+    const newGoodDeal = new GoodDeal()
+    newGoodDeal.goodDealTitle = createGoodDeal.goodDealTitle
+    newGoodDeal.goodDealLink = createGoodDeal.goodDealLink
+    newGoodDeal.goodDealContent = createGoodDeal.goodDealContent
+    newGoodDeal.image = createGoodDeal.image
+    newGoodDeal.user = userFromCtx.user as User
+    newGoodDeal.createdAt = new Date()
 
-    const goodDealFromDB = await dataSource.manager.save(GoodDeal, newGoodDeal);
+    const goodDealFromDB = await dataSource.manager.save(GoodDeal, newGoodDeal)
 
-    return goodDealFromDB;
+    return goodDealFromDB
   }
 }

@@ -1,5 +1,5 @@
 export interface IContribution {
-  contributionId: number;
-  amount: number;
-  createdAt: Date;
+  contributionId: number
+  amount: number
+  createdAt: Date
 }

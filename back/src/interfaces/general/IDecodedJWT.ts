@@ -1,4 +1,4 @@
 export interface IDecodedJWT {
-  email: string;
-  iat: number;
+  email: string
+  iat: number
 }
