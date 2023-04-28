@@ -1,5 +1,5 @@
-import { IUser } from "../entities/IUser";
+import { IUser } from '../entities/IUser'
 
 export interface IUserCtx {
-  user: IUser;
+  user: IUser
 }

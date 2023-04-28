@@ -1,16 +1,16 @@
-import { InputType, Field } from "type-graphql";
+import { InputType, Field } from 'type-graphql'
 
-@InputType({ description: "Create GoodDeal data" })
+@InputType({ description: 'Create GoodDeal data' })
 export class CreateGoodDealInput {
   @Field(() => String)
-  goodDealTitle: string;
+  goodDealTitle: string
 
   @Field(() => String)
-  goodDealContent: string;
+  goodDealContent: string
 
   @Field(() => String, { nullable: true })
-  goodDealLink?: string;
+  goodDealLink?: string
 
   @Field(() => String, { nullable: true })
-  image?: string;
+  image?: string
 }

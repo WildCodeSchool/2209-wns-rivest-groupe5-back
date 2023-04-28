@@ -1,4 +1,4 @@
 export interface IFollowing {
-    user: number;
-    userFollowed: number;
+  user: number
+  userFollowed: number
 }

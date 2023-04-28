@@ -1,7 +1,7 @@
 import { ApolloError } from "@apollo/client";
 import {
-    activityTypeLabel,
-    activityTypeName,
+  activityTypeLabel,
+  activityTypeName,
 } from "../interfaces/entitites/ActivityTypesTypesValues";
 import { ITestActivity } from "src/interfaces/entitites/testActivityInterface";
 import { ITestActivityType } from "src/interfaces/entitites/testActivityTypeInterface";
@@ -17,109 +17,109 @@ import { CREATE_ACTIVITY } from "./helpers/graphql/mutations/activity/createActi
 import { UPDATE_ACTIVITY } from "./helpers/graphql/mutations/activity/updateActivity";
 
 describe("Activity resolver", () => {
-    let testUser: ITestUser;
-    let testUserToken: string;
-    let testUser2: ITestUser;
-    let testUserToken2: string;
-    let testAdmin: ITestUser;
-    let testAdminToken: string;
-    let testActivityType: ITestActivityType;
-    const testActivityTypeName = activityTypeName.transport;
-    const testActivityTypeLabel = activityTypeLabel.Transport;
-    let testActivity: ITestActivity;
+  let testUser: ITestUser;
+  let testUserToken: string;
+  let testUser2: ITestUser;
+  let testUserToken2: string;
+  let testAdmin: ITestUser;
+  let testAdminToken: string;
+  let testActivityType: ITestActivityType;
+  const testActivityTypeName = activityTypeName.transport;
+  const testActivityTypeLabel = activityTypeLabel.Transport;
+  let testActivity: ITestActivity;
 
-    beforeAll(async () => {
-        testUser = await generateTestUser();
-        testUserToken = await getTokenForUser("test", testUser.email);
-        testUser2 = await generateTestUser();
-        testUserToken2 = await getTokenForUser("test", testUser2.email);
-        testAdmin = await generateTestAdmin();
-        testAdminToken = await getTokenForUser("test", testAdmin.email);
+  beforeAll(async () => {
+    testUser = await generateTestUser();
+    testUserToken = await getTokenForUser("test", testUser.email);
+    testUser2 = await generateTestUser();
+    testUserToken2 = await getTokenForUser("test", testUser2.email);
+    testAdmin = await generateTestAdmin();
+    testAdminToken = await getTokenForUser("test", testAdmin.email);
 
-        testActivityType = await generateTestActivityType(
-            testActivityTypeName,
-            testActivityTypeLabel,
-            testAdminToken
-        );
+    testActivityType = await generateTestActivityType(
+      testActivityTypeName,
+      testActivityTypeLabel,
+      testAdminToken
+    );
 
-        testActivity = await generateTestActivity(
-            testActivityType.activityTypeId,
-            testUserToken
-        );
+    testActivity = await generateTestActivity(
+      testActivityType.activityTypeId,
+      testUserToken
+    );
+  });
+
+  afterAll(async () => {
+    await clearDB();
+  });
+
+  it("create activity", async () => {
+    const res = await client.mutate({
+      mutation: CREATE_ACTIVITY,
+      variables: {
+        data: {
+          activityTypeId: testActivityType.activityTypeId,
+          description: "This is a test Activity",
+          carbonQuantity: 10,
+          title: "Test Activity",
+        },
+      },
+      fetchPolicy: "no-cache",
+      context: {
+        headers: {
+          authorization: testUserToken,
+        },
+      },
+    });
+    expect(res.data.createActivity.user.email).toEqual(testUser.email);
+    expect(res.data.createActivity.activityType.name).toEqual(
+      testActivityTypeName
+    );
+    expect(res.data.createActivity.carbonQuantity).toEqual(10);
+  });
+
+  it("disallow update activity if user is not the creator and not admin", async () => {
+    let apolloError;
+    try {
+      await client.mutate({
+        mutation: UPDATE_ACTIVITY,
+        variables: {
+          activityId: testActivity.activityId,
+          data: {
+            title: "updatedTitle",
+          },
+        },
+        fetchPolicy: "no-cache",
+        context: {
+          headers: {
+            authorization: testUserToken2,
+          },
+        },
+      });
+    } catch (error) {
+      apolloError = error;
+    }
+
+    expect(apolloError).not.toBeUndefined();
+    expect(apolloError instanceof ApolloError).toBeTruthy();
+  });
+
+  it("allow update activity if user is the creator", async () => {
+    const res = await client.mutate({
+      mutation: UPDATE_ACTIVITY,
+      variables: {
+        activityId: testActivity.activityId,
+        data: {
+          title: "updatedTitle",
+        },
+      },
+      fetchPolicy: "no-cache",
+      context: {
+        headers: {
+          authorization: testUserToken,
+        },
+      },
     });
 
-    afterAll(async () => {
-        await clearDB();
-    });
-
-    it("create activity", async () => {
-        const res = await client.mutate({
-            mutation: CREATE_ACTIVITY,
-            variables: {
-                data: {
-                    activityTypeId: testActivityType.activityTypeId,
-                    description: "This is a test Activity",
-                    carbonQuantity: 10,
-                    title: "Test Activity",
-                },
-            },
-            fetchPolicy: "no-cache",
-            context: {
-                headers: {
-                    authorization: testUserToken,
-                },
-            },
-        });
-        expect(res.data.createActivity.user.email).toEqual(testUser.email);
-        expect(res.data.createActivity.activityType.name).toEqual(
-            testActivityTypeName
-        );
-        expect(res.data.createActivity.carbonQuantity).toEqual(10);
-    });
-
-    it("disallow update activity if user is not the creator and not admin", async () => {
-        let apolloError;
-        try {
-            await client.mutate({
-                mutation: UPDATE_ACTIVITY,
-                variables: {
-                    activityId: testActivity.activityId,
-                    data: {
-                        title: "updatedTitle",
-                    },
-                },
-                fetchPolicy: "no-cache",
-                context: {
-                    headers: {
-                        authorization: testUserToken2,
-                    },
-                },
-            });
-        } catch (error) {
-            apolloError = error;
-        }
-
-        expect(apolloError).not.toBeUndefined();
-        expect(apolloError instanceof ApolloError).toBeTruthy();
-    });
-
-    it("allow update activity if user is the creator", async () => {
-        const res = await client.mutate({
-            mutation: UPDATE_ACTIVITY,
-            variables: {
-                activityId: testActivity.activityId,
-                data: {
-                    title: "updatedTitle",
-                },
-            },
-            fetchPolicy: "no-cache",
-            context: {
-                headers: {
-                    authorization: testUserToken,
-                },
-            },
-        });
-
-        expect(res.data.updateActivity.title).toEqual("updatedTitle");
-    });
+    expect(res.data.updateActivity.title).toEqual("updatedTitle");
+  });
 });

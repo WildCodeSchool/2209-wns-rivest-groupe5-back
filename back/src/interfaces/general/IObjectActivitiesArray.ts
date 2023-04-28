@@ -1,5 +1,5 @@
-import { IActivity } from "../entities/IActivity";
+import { IActivity } from '../entities/IActivity'
 
 export interface IObjectActivitiesArray {
-  [key: string]: IActivity[];
+  [key: string]: IActivity[]
 }

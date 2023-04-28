@@ -1,20 +1,20 @@
-import { InputType, Field } from "type-graphql";
-import { ActivityType } from "../../entities/activityType";
+import { InputType, Field } from 'type-graphql'
+import { ActivityType } from '../../entities/activityType'
 
-@InputType({ description: "Create activity data" })
+@InputType({ description: 'Create activity data' })
 export class CreateActivityInput {
   @Field(() => String)
-  title: string;
+  title: string
 
   @Field(() => Date, { nullable: true })
-  activityDate?: Date;
+  activityDate?: Date
 
   @Field(() => Number)
-  carbonQuantity: number;
+  carbonQuantity: number
 
   @Field(() => String, { nullable: true })
-  description?: string;
+  description?: string
 
   @Field(() => Number)
-  activityTypeId: number;
+  activityTypeId: number
 }
