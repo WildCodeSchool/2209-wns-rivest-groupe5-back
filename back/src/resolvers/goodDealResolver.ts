@@ -64,18 +64,6 @@ export class GoodDealResolver {
     return goodDeal;
   }
 
-  @Query(() => GoodDeal)
-  async getGoodDeal(@Arg('goodDealId') goodDealId: number): Promise<GoodDeal | null> {
-    const goodDeal = await dataSource.getRepository(GoodDeal).findOne({
-      where: {
-        goodDealId: goodDealId,
-      },
-      relations: ['goodDealVotes.user', 'user'],
-    });
-
-    return goodDeal;
-  }
-
   @Authorized()
   @Query(() => [GoodDeal])
   async getAllMyGoodDeals(@Ctx() ctx: Context): Promise<GoodDeal[]> {
