@@ -21,7 +21,7 @@ import { IUserCtx } from '../interfaces/general/IUserCtx'
 import { userVisibility } from '../interfaces/entities/UserVisibilityOptions'
 import { Following } from '../entities/userIsFollowing'
 import { IUser } from '../interfaces/entities/IUser'
-import { ILike, getRepository, SelectQueryBuilder } from 'typeorm'
+import { SelectQueryBuilder } from 'typeorm'
 
 @ObjectType()
 class LoginResponse {

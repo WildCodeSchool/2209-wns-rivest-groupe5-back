@@ -93,7 +93,11 @@ export class User implements IUser {
   @Column({ nullable: true })
   passwordResetExpires: Date
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: USER_ROLES,
+    default: USER_ROLES.USER,
+  })
   role: USER_ROLES
 
   public get createPasswordResetToken(): string {
