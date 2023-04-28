@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core'
 
 export const GET_ALL_CONTRIBUTION = gql`
   query Query {
@@ -7,4 +7,4 @@ export const GET_ALL_CONTRIBUTION = gql`
       amount
     }
   }
-`;
+`

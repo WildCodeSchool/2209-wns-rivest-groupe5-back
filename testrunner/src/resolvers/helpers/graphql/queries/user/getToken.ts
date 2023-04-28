@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core'
 
 export const GET_TOKEN = gql`
   query Query($password: String!, $email: String!) {
@@ -12,4 +12,4 @@ export const GET_TOKEN = gql`
       }
     }
   }
-`;
+`

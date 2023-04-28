@@ -1,4 +1,4 @@
 export interface ITestActivityType {
-  activityTypeId: number;
-  name: string;
+  activityTypeId: number
+  name: string
 }

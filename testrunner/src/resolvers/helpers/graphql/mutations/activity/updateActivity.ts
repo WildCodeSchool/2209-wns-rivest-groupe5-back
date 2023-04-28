@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core'
 
 export const UPDATE_ACTIVITY = gql`
   mutation UpdateActivity($data: UpdateActivityInput!, $activityId: Float!) {
@@ -6,4 +6,4 @@ export const UPDATE_ACTIVITY = gql`
       title
     }
   }
-`;
+`

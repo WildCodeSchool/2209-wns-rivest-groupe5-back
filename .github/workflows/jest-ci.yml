@@ -2,9 +2,9 @@ name: jest-ci
 
 on:
   push:
-    branches: ["main", "dev"]
+    branches: ['main', 'dev']
   pull_request:
-    branches: ["main", "dev"]
+    branches: ['main', 'dev']
 
 jobs:
   test-back:
@@ -39,5 +39,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          context: "{{defaultContext}}:back"
+          context: '{{defaultContext}}:back'
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/wildcarbon:latest
