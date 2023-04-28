@@ -13,6 +13,7 @@ import { User } from "../entities/user";
 import { IUserCtx } from "../interfaces/general/IUserCtx";
 import dataSource from "../utils/datasource";
 import { CreateGoodDealInput } from "./inputs/createGoodDealInput";
+import { FindOptionsWhere } from "typeorm";
 
 export enum FindOptionsOrderValue {
   ASC = 'ASC',
@@ -28,7 +29,10 @@ export class GoodDealResolver {
   @Query(() => [GoodDeal])
   async getAllGoodDeals(
     @Arg('limit', {nullable: true, defaultValue: undefined}) limit: number = 0,
-    @Arg('order', () => FindOptionsOrderValue, { nullable: true, defaultValue: undefined })
+    @Arg('order', () => FindOptionsOrderValue, {
+      nullable: true,
+      defaultValue: undefined,
+    })
     order: FindOptionsOrderValue = FindOptionsOrderValue.ASC,
   ): Promise<GoodDeal[]> {
     const allGoodDeals = await dataSource.getRepository(GoodDeal).find({
@@ -45,6 +49,18 @@ export class GoodDealResolver {
     });
 
     return allGoodDeals;
+  }
+
+  @Query(() => GoodDeal)
+  async getGoodDeal(@Arg('goodDealId') goodDealId: number): Promise<GoodDeal | null> {
+    const goodDeal = await dataSource.getRepository(GoodDeal).findOne({
+      where: {
+        goodDealId: goodDealId,
+      },
+      relations: ['goodDealVotes.user', 'user'],
+    });
+
+    return goodDeal;
   }
 
   @Authorized()
