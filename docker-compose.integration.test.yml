@@ -31,6 +31,7 @@ services:
     restart: always
     environment:
       DB: dbtest
+      POSTGRES_PASSWORD: test
     env_file:
       - ./back/.env
     depends_on:

@@ -332,5 +332,3 @@ export class UserResolver {
     return updatedUser
   }
 }
-
-// test

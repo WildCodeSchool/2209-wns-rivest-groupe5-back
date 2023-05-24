@@ -10,6 +10,7 @@ export const generateTestUser = async (): Promise<ITestUser> => {
       password: 'test',
       firstname: 'testfirst',
       lastname: 'testlast',
+      avatar:'avatarTest'
     },
     fetchPolicy: 'no-cache',
   })
