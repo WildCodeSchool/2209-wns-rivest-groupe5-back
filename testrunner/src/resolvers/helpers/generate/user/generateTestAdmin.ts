@@ -11,6 +11,7 @@ export const generateTestAdmin = async (): Promise<ITestUser> => {
       password: 'test',
       firstname: 'test',
       lastname: 'admin',
+      avatar: 'avatarTest'
     },
     fetchPolicy: 'no-cache',
   })

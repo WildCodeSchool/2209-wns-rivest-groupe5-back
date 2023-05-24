@@ -20,6 +20,7 @@ describe('User resolver', () => {
         password: 'test',
         firstname: 'testfirst',
         lastname: 'testlast',
+        avatar: 'avatarTest'
       },
       fetchPolicy: 'no-cache',
     })
