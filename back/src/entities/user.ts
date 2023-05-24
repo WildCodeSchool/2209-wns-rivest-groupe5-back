@@ -8,7 +8,6 @@ import {
 } from 'typeorm'
 import { IUser } from '../interfaces/entities/IUser'
 import { Activity } from './activity'
-import { Contribution } from './contribution'
 import { GoodDeal } from './goodDeal'
 import crypto from 'crypto'
 import { USER_ROLES } from '../utils/userRoles'
@@ -72,12 +71,6 @@ export class User implements IUser {
     cascade: true,
   })
   activities: Activity[]
-
-  @Field(() => [Contribution], { nullable: true })
-  @OneToMany(() => Contribution, (contribution) => contribution.user, {
-    cascade: true,
-  })
-  contributions: Contribution[]
 
   @OneToMany(() => Following, (following) => following.user)
   followings: Following[]

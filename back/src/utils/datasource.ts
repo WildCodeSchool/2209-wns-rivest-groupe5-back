@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm'
 import { Activity } from '../entities/activity'
 import { ActivityType } from '../entities/activityType'
-import { Contribution } from '../entities/contribution'
 import { GoodDeal } from '../entities/goodDeal'
 import { GoodDealVote } from '../entities/goodDealVote'
 import { User } from '../entities/user'
@@ -15,15 +14,7 @@ const dataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD || 'azerty',
   database: 'postgres',
   synchronize: true,
-  entities: [
-    User,
-    Activity,
-    ActivityType,
-    Contribution,
-    GoodDeal,
-    GoodDealVote,
-    Following,
-  ],
+  entities: [User, Activity, ActivityType, GoodDeal, GoodDealVote, Following],
   migrations: ['src/migrations/*.ts'],
   // logging: ["query", "error"],
 })

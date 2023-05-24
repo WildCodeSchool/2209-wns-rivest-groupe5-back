@@ -7,7 +7,6 @@ import { buildSchema } from 'type-graphql'
 import { UserResolver } from './resolvers/userResolver'
 import { ActivityResolver } from './resolvers/activityResolver'
 import { ActivityTypeResolver } from './resolvers/activityTypeResolver'
-import { ContributionResolver } from './resolvers/contributionResolver'
 import { GoodDealResolver } from './resolvers/goodDealResolver'
 import { TokenResolver } from './resolvers/tokenResolver'
 import { IDecodedJWT } from './interfaces/general/IDecodedJWT'
@@ -38,7 +37,6 @@ async function start(): Promise<void> {
         UserResolver,
         ActivityResolver,
         ActivityTypeResolver,
-        ContributionResolver,
         GoodDealResolver,
         GoodDealVoteResolver,
         DeleteAllEntitiesResolver,

@@ -1,5 +1,4 @@
 import { Activity } from '../../entities/activity'
-import { Contribution } from '../../entities/contribution'
 import { GoodDeal } from '../../entities/goodDeal'
 import { GoodDealVote } from '../../entities/goodDealVote'
 import { Following } from '../../entities/userIsFollowing'
@@ -20,7 +19,6 @@ export interface IUser {
   goodDeals: GoodDeal[]
   goodDealVotes?: GoodDealVote[]
   activities: Activity[]
-  contributions: Contribution[]
   followings: Following[]
   followers: Following[]
   visibility: userVisibility

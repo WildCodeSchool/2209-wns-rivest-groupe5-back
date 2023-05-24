@@ -1,7 +1,6 @@
 import { Resolver, Mutation, Arg } from 'type-graphql'
 import { Activity } from '../entities/activity'
 import { ActivityType } from '../entities/activityType'
-import { Contribution } from '../entities/contribution'
 import { GoodDeal } from '../entities/goodDeal'
 import { User } from '../entities/user'
 import dataSource from '../utils/datasource'
@@ -18,7 +17,6 @@ export class DeleteAllEntitiesResolver {
     // Delete all entities in the database
     await dataSource.manager.delete(Activity, {})
     await dataSource.manager.delete(ActivityType, {})
-    await dataSource.manager.delete(Contribution, {})
     await dataSource.manager.delete(GoodDeal, {})
     await dataSource.manager.delete(User, {})
 
