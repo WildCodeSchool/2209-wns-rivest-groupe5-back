@@ -1,4 +1,4 @@
-import { GoodDealVote } from '../../entities/gooDealVote'
+import { GoodDealVote } from '../../entities/goodDealVote'
 
 export interface IGoodDeal {
   goodDealId: number

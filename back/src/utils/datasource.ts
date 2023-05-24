@@ -3,7 +3,7 @@ import { Activity } from '../entities/activity'
 import { ActivityType } from '../entities/activityType'
 import { Contribution } from '../entities/contribution'
 import { GoodDeal } from '../entities/goodDeal'
-import { GoodDealVote } from '../entities/gooDealVote'
+import { GoodDealVote } from '../entities/goodDealVote'
 import { User } from '../entities/user'
 import { Following } from '../entities/userIsFollowing'
 
