@@ -16,6 +16,7 @@ import { DeleteAllEntitiesResolver } from './resolvers/testResolver'
 import { GoodDealVoteResolver } from './resolvers/goodDealVoteResolver'
 import { GetStatsResolver } from './resolvers/getStatsResolver'
 import { FollowingResolver } from './resolvers/followingResolver'
+import { PopulateInitDb } from './migrations/PopulateInitDb'
 
 dotenv.config()
 
@@ -24,6 +25,12 @@ const port = 5050
 async function start(): Promise<void> {
   try {
     await dataSource.initialize()
+
+    // initialisation BDD en DEV
+    console.log('🚀 ~ migration init DB is starting...')
+    const migration = new PopulateInitDb()
+    await migration.up(dataSource.createQueryRunner())
+    console.log('🚀 ~ migration init DB done ✅')
 
     const schema = await buildSchema({
       resolvers: [
@@ -50,6 +57,7 @@ async function start(): Promise<void> {
         }
       },
     })
+
     const server = new ApolloServer({
       schema,
       context: async ({ req }) => {
