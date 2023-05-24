@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { IGoodDeal } from '../interfaces/entities/IGoodDeal'
-import { GoodDealVote } from './gooDealVote'
+import { GoodDealVote } from './goodDealVote'
 import { User } from './user'
 
 @ObjectType()

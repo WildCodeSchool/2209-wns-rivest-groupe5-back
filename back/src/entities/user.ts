@@ -12,7 +12,7 @@ import { Contribution } from './contribution'
 import { GoodDeal } from './goodDeal'
 import crypto from 'crypto'
 import { USER_ROLES } from '../utils/userRoles'
-import { GoodDealVote } from './gooDealVote'
+import { GoodDealVote } from './goodDealVote'
 import { userVisibility } from '../interfaces/entities/UserVisibilityOptions'
 import { Following } from './userIsFollowing'
 

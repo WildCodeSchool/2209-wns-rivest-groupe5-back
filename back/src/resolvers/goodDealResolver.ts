@@ -3,7 +3,9 @@ import {
   Arg,
   Authorized,
   Ctx,
+  Field,
   Mutation,
+  ObjectType,
   Query,
   Resolver,
   registerEnumType,
@@ -23,6 +25,12 @@ export enum FindOptionsOrderValue {
 registerEnumType(FindOptionsOrderValue, {
   name: 'FindOptionsOrderValue',
 })
+
+@ObjectType()
+class GoodDealWithTotal extends GoodDeal {
+  @Field()
+  total: number
+}
 
 @Resolver(GoodDeal)
 export class GoodDealResolver {
@@ -52,10 +60,10 @@ export class GoodDealResolver {
     return allGoodDeals
   }
 
-  @Query(() => GoodDeal)
+  @Query(() => GoodDealWithTotal)
   async getGoodDeal(
     @Arg('goodDealId') goodDealId: number
-  ): Promise<GoodDeal | null> {
+  ): Promise< GoodDealWithTotal | undefined > {
     const goodDeal = await dataSource.getRepository(GoodDeal).findOne({
       where: {
         goodDealId: goodDealId,
@@ -63,7 +71,14 @@ export class GoodDealResolver {
       relations: ['goodDealVotes.user', 'user'],
     })
 
-    return goodDeal
+    var total = goodDeal?.goodDealVotes.reduce((accumulator, current) => accumulator + current.value, 0) ?? 0
+
+    console.log(goodDeal)
+
+    if (!goodDeal) {
+      throw new Error("Good deal not found");
+    }
+    return { ...goodDeal, total: total };
   }
 
   @Authorized()
