@@ -39,6 +39,7 @@ services:
     command: npm run dev
     volumes:
       - ./back/src/:/app/src/
+      - ./back/back/init_populate/:/app/init_populate/
     healthcheck:
       test: 'curl --fail --request POST --header ''content-type: application/json'' --url ''http://localhost:5050'' --data ''{"query":"query { __typename }"}'' || exit 1'
       interval: 2s
