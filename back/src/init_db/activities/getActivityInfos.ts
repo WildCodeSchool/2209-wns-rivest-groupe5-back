@@ -1,10 +1,10 @@
 import { DeepPartial } from 'typeorm'
 import getIpsumText from '../utils/getIpsumText'
-import { User } from '../../src/entities/user'
-import { Activity } from '../../src/entities/activity'
-import { ActivityType } from '../../src/entities/activityType'
 import { getRandomActivityDate } from '../utils/getRandomActivityDate'
 import getRandomNumberBetween from '../utils/getRandomNumberBetween'
+import { ActivityType } from '../../entities/activityType'
+import { User } from '../../entities/user'
+import { Activity } from '../../entities/activity'
 
 const getActivitylInfos = ({
   titleWordsLength,

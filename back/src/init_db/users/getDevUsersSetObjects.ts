@@ -1,7 +1,7 @@
 import { DeepPartial } from 'typeorm'
 import getUserInfos from './getUserInfos'
-import { User } from '../../src/entities/user'
-import { userVisibility } from '../../src/interfaces/entities/UserVisibilityOptions'
+import { userVisibility } from '../../interfaces/entities/UserVisibilityOptions'
+import { User } from '../../entities/user'
 
 const getDevUsersSetObjects = async (): Promise<DeepPartial<User>[]> => {
   const u1 = await getUserInfos({

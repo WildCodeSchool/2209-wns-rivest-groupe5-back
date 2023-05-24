@@ -1,9 +1,9 @@
 import { DeepPartial } from 'typeorm'
-import { GoodDeal } from '../../src/entities/goodDeal'
-import { User } from '../../src/entities/user'
 import getGoodDealInfos from './getGoodDealInfos'
 import getRandomNumberBetween from '../utils/getRandomNumberBetween'
 import getRandomElement from '../utils/getRandomElementFromArray'
+import { User } from '../../entities/user'
+import { GoodDeal } from '../../entities/goodDeal'
 
 const getRandomGoodDeals = ({
   users,

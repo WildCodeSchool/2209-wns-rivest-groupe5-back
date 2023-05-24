@@ -1,7 +1,7 @@
 import { DeepPartial } from 'typeorm'
-import { GoodDeal } from '../../src/entities/goodDeal'
 import getIpsumText from '../utils/getIpsumText'
-import { User } from '../../src/entities/user'
+import { User } from '../../entities/user'
+import { GoodDeal } from '../../entities/goodDeal'
 
 const getGoodDealInfos = ({
   titleWordsLength,

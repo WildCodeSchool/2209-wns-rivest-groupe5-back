@@ -1,7 +1,9 @@
 import { DeepPartial } from 'typeorm'
-import { ActivityType } from '../../src/entities/activityType'
-import { activityTypeName } from '../../src/interfaces/entities/ActivityTypesTypesValues'
-import { activityTypeLabel } from '../../src/interfaces/entities/ActivityTypesTypesValues'
+import {
+  activityTypeLabel,
+  activityTypeName,
+} from '../../interfaces/entities/ActivityTypesTypesValues'
+import { ActivityType } from '../../entities/activityType'
 
 const getActivityTypes = (): DeepPartial<ActivityType>[] => {
   return [

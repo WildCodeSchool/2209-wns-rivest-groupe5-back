@@ -1,10 +1,10 @@
 import { DeepPartial } from 'typeorm'
-import { Activity } from '../../src/entities/activity'
-import { User } from '../../src/entities/user'
 import getRandomNumberBetween from '../utils/getRandomNumberBetween'
 import getActivitylInfos from './getActivityInfos'
 import getRandomElement from '../utils/getRandomElementFromArray'
 import getActivityTypes from './getActivityTypes'
+import { User } from '../../entities/user'
+import { Activity } from '../../entities/activity'
 
 const getRandomActivities = ({
   users,

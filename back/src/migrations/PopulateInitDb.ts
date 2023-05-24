@@ -1,14 +1,14 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
 import dataSource from '../utils/datasource'
 import { ActivityType } from '../entities/activityType'
-import getActivityTypes from '../../init_populate/activities/getActivityTypes'
 import { User } from '../entities/user'
-import getUserInfos from '../../init_populate/users/getUserInfos'
-import getDevUsersSetObjects from '../../init_populate/users/getDevUsersSetObjects'
-import getRandomGoodDeals from '../../init_populate/gooddeals/getRandomGoodDeals'
+import getUserInfos from '../init_db/users/getUserInfos'
+import getDevUsersSetObjects from '../init_db/users/getDevUsersSetObjects'
+import getRandomGoodDeals from '../init_db/gooddeals/getRandomGoodDeals'
 import { Activity } from '../entities/activity'
 import { GoodDeal } from '../entities/goodDeal'
-import getRandomActivities from '../../init_populate/activities/getRandomActivities'
+import getRandomActivities from '../init_db/activities/getRandomActivities'
+import getActivityTypes from '../init_db/activities/getActivityTypes'
 
 export class PopulateInitDb implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

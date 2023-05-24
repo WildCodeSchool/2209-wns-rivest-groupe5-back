@@ -1,8 +1,8 @@
 import { DeepPartial } from 'typeorm'
-import { User } from '../../src/entities/user'
 import * as argon2 from 'argon2'
 import getuserMutualPassword from './getuserMutualPassword'
-import { userVisibility } from '../../src/interfaces/entities/UserVisibilityOptions'
+import { User } from '../../entities/user'
+import { userVisibility } from '../../interfaces/entities/UserVisibilityOptions'
 
 const getUserInfos = async ({
   firstname,
