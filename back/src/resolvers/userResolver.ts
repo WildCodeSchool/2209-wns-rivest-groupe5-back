@@ -331,4 +331,20 @@ export class UserResolver {
 
     return updatedUser
   }
+
+  @Authorized()
+  @Mutation(() => String)
+  async deleteMyAccount(@Ctx() ctx: Context): Promise<string> {
+    const userFromCtx = ctx as IUserCtx
+
+    const test = await dataSource
+      .getRepository(User)
+      .delete(userFromCtx.user.userId)
+
+    if (!test.affected) {
+      throw new Error('User not found to delete')
+    }
+
+    return 'User account deleted successfully'
+  }
 }

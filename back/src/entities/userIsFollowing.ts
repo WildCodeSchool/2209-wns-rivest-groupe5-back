@@ -14,11 +14,11 @@ export class Following implements IFollowing {
   @PrimaryColumn()
   userFollowed: number
 
-  @ManyToOne(() => User, (user) => user.followings)
+  @ManyToOne(() => User, (user) => user.followings, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user' })
   follower: User
 
-  @ManyToOne(() => User, (user) => user.followers)
+  @ManyToOne(() => User, (user) => user.followers, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userFollowed' })
   followed: User
 }

@@ -44,6 +44,6 @@ export class Activity implements IActivity {
   activityType: ActivityType
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.activities)
+  @ManyToOne(() => User, (user) => user.activities, { onDelete: 'CASCADE' })
   user: User
 }
