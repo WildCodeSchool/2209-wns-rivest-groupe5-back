@@ -7,21 +7,21 @@ import {
   Query,
   Resolver,
   Ctx,
-} from "type-graphql";
-import * as argon2 from "argon2";
-import jwt from "jsonwebtoken";
-import { User } from "../entities/user";
-import dataSource from "../utils/datasource";
-import Email from "../services/email";
-import { getFrontendBaseUrl } from "../utils/getBaseUrls";
-import hashSha256 from "../utils/hashSha256";
-import { USER_ROLES } from "../utils/userRoles";
-import { Context } from "apollo-server-core";
-import { IUserCtx } from "../interfaces/general/IUserCtx";
-import { userVisibility } from "../interfaces/entities/UserVisibilityOptions";
-import { Following } from "../entities/userIsFollowing";
-import { IUser } from "../interfaces/entities/IUser";
-import { ILike, getRepository, SelectQueryBuilder } from "typeorm";
+} from 'type-graphql'
+import * as argon2 from 'argon2'
+import jwt from 'jsonwebtoken'
+import { User } from '../entities/user'
+import dataSource from '../utils/datasource'
+import Email from '../services/email'
+import { getFrontendBaseUrl } from '../utils/getBaseUrls'
+import hashSha256 from '../utils/hashSha256'
+import { USER_ROLES } from '../utils/userRoles'
+import { Context } from 'apollo-server-core'
+import { IUserCtx } from '../interfaces/general/IUserCtx'
+import { userVisibility } from '../interfaces/entities/UserVisibilityOptions'
+import { Following } from '../entities/userIsFollowing'
+import { IUser } from '../interfaces/entities/IUser'
+import { ILike, getRepository, SelectQueryBuilder } from 'typeorm'
 
 @ObjectType()
 class LoginResponse {
@@ -72,16 +72,16 @@ export class UserResolver {
       }
 
       // target user is private
-      throw new Error("Cannot access unfollowed private user's data");
+      throw new Error("Cannot access unfollowed private user's data")
     }
 
-    return getUserdata;
+    return getUserdata
   }
 
   @Query(() => LoginResponse)
   async getToken(
-    @Arg("email") email: string,
-    @Arg("password") password: string
+    @Arg('email') email: string,
+    @Arg('password') password: string
   ): Promise<LoginResponse> {
     try {
       const userFromDB = await dataSource.manager.findOneByOrFail(User, {
@@ -115,7 +115,7 @@ export class UserResolver {
     @Arg('searchString') searchString: string
   ): Promise<User[]> {
     const searchTerms = searchString.split(' ')
-    const queryBuilder = await dataSource
+    const queryBuilder = dataSource
       .getRepository(User)
       .createQueryBuilder('user')
 
@@ -247,7 +247,7 @@ export class UserResolver {
     @Arg('password') password: string,
     @Arg('firstname') firstname: string,
     @Arg('lastname') lastname: string,
-    @Arg("avatar") avatar?: string
+    @Arg('avatar') avatar?: string
   ): Promise<User> {
     const newUser = new User()
     newUser.email = email.toLowerCase().trim()
@@ -255,7 +255,7 @@ export class UserResolver {
     newUser.lastname = lastname
     newUser.password = await argon2.hash(password.trim())
     newUser.role = USER_ROLES.USER
-    if(avatar){
+    if (avatar) {
       newUser.avatar = avatar
     }
 

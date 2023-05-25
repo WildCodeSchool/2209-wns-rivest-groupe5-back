@@ -16,6 +16,7 @@ import { IUserCtx } from '../interfaces/general/IUserCtx'
 import dataSource from '../utils/datasource'
 import { CreateGoodDealInput } from './inputs/createGoodDealInput'
 import { FindOptionsWhere } from 'typeorm'
+import { USER_ROLES } from '../utils/userRoles'
 
 export enum FindOptionsOrderValue {
   ASC = 'ASC',
@@ -63,7 +64,7 @@ export class GoodDealResolver {
   @Query(() => GoodDealWithTotal)
   async getGoodDeal(
     @Arg('goodDealId') goodDealId: number
-  ): Promise< GoodDealWithTotal | undefined > {
+  ): Promise<GoodDealWithTotal | undefined> {
     const goodDeal = await dataSource.getRepository(GoodDeal).findOne({
       where: {
         goodDealId: goodDealId,
@@ -71,14 +72,18 @@ export class GoodDealResolver {
       relations: ['goodDealVotes.user', 'user'],
     })
 
-    var total = goodDeal?.goodDealVotes.reduce((accumulator, current) => accumulator + current.value, 0) ?? 0
+    var total =
+      goodDeal?.goodDealVotes.reduce(
+        (accumulator, current) => accumulator + current.value,
+        0
+      ) ?? 0
 
     console.log(goodDeal)
 
     if (!goodDeal) {
-      throw new Error("Good deal not found");
+      throw new Error('Good deal not found')
     }
-    return { ...goodDeal, total: total };
+    return { ...goodDeal, total: total }
   }
 
   @Authorized()
@@ -120,5 +125,33 @@ export class GoodDealResolver {
     const goodDealFromDB = await dataSource.manager.save(GoodDeal, newGoodDeal)
 
     return goodDealFromDB
+  }
+
+  @Authorized()
+  @Mutation(() => String)
+  async deleteGoodDeal(
+    @Ctx() ctx: Context,
+    @Arg('goodDealId') goodDealId: number
+  ): Promise<string> {
+    const userFromCtx = ctx as IUserCtx
+
+    const goodDeal = await dataSource.getRepository(GoodDeal).findOneOrFail({
+      relations: {
+        user: true,
+      },
+      where: { goodDealId: goodDealId },
+    })
+
+    if (userFromCtx.user.role !== USER_ROLES.ADMIN) {
+      // admin can remove any goodDeal
+      if (goodDeal.user.userId !== userFromCtx.user.userId) {
+        // otherwise user must be the author to delete
+        throw new Error('You are not authorized to delete this good deal')
+      }
+    }
+
+    await dataSource.getRepository(GoodDeal).remove(goodDeal)
+
+    return 'Good Deal Deleted Successfully.'
   }
 }
