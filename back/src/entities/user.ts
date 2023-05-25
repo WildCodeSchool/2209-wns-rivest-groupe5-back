@@ -72,10 +72,14 @@ export class User implements IUser {
   })
   activities: Activity[]
 
-  @OneToMany(() => Following, (following) => following.user)
+  @OneToMany(() => Following, (following) => following.user, {
+    cascade: true,
+  })
   followings: Following[]
 
-  @OneToMany(() => Following, (following) => following.userFollowed)
+  @OneToMany(() => Following, (following) => following.userFollowed, {
+    cascade: true,
+  })
   followers: Following[]
 
   @Field({ nullable: true })
