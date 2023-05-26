@@ -270,17 +270,24 @@ export class UserResolver {
 
   @Authorized()
   @Mutation(() => Boolean)
-  async inviteFriend(@Arg('email') email: string): Promise<Boolean> {
+  async inviteFriend(
+    @Ctx() ctx: Context,
+    @Arg('email') email: string
+  ): Promise<Boolean> {
+    const userFromCtx = ctx as IUserCtx
+
     if (email === undefined || email.trim() === '')
       throw new Error('No email provided to invite a friend.')
 
     const fictiveUser = new User()
     fictiveUser.email = email.trim()
 
-    const registerUrl = `${getFrontendBaseUrl()}/register`
+    const registerUrl = `${getFrontendBaseUrl()}`
 
     if (process.env.DB !== 'dbtest') {
-      await new Email(fictiveUser, registerUrl).sendInvitation()
+      await new Email(fictiveUser, registerUrl, undefined, {
+        sender: userFromCtx.user,
+      }).sendInvitation()
     }
 
     return true
