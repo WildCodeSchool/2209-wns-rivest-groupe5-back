@@ -5,6 +5,7 @@ export interface IGoodDeal {
   goodDealTitle: string
   goodDealLink?: string
   goodDealContent: string
+  goodDealDescription?: string
   goodDealVotes: GoodDealVote[]
   image?: string
   createdAt: Date

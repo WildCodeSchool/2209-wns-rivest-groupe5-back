@@ -15,7 +15,6 @@ import { User } from '../entities/user'
 import { IUserCtx } from '../interfaces/general/IUserCtx'
 import dataSource from '../utils/datasource'
 import { CreateGoodDealInput } from './inputs/createGoodDealInput'
-import { FindOptionsWhere } from 'typeorm'
 import { USER_ROLES } from '../utils/userRoles'
 
 export enum FindOptionsOrderValue {
@@ -118,6 +117,7 @@ export class GoodDealResolver {
     newGoodDeal.goodDealTitle = createGoodDeal.goodDealTitle
     newGoodDeal.goodDealLink = createGoodDeal.goodDealLink
     newGoodDeal.goodDealContent = createGoodDeal.goodDealContent
+    newGoodDeal.goodDealDescription = createGoodDeal.goodDealDescription
     newGoodDeal.image = createGoodDeal.image
     newGoodDeal.user = userFromCtx.user as User
     newGoodDeal.createdAt = new Date()
