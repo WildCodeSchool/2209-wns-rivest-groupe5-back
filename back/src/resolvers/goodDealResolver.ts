@@ -8,7 +8,6 @@ import {
   ObjectType,
   Query,
   Resolver,
-  registerEnumType,
 } from 'type-graphql'
 import { GoodDeal } from '../entities/goodDeal'
 import { User } from '../entities/user'
@@ -17,15 +16,7 @@ import dataSource from '../utils/datasource'
 import { CreateGoodDealInput } from './inputs/createGoodDealInput'
 import { USER_ROLES } from '../utils/userRoles'
 import { GoodDealPaginatedResult } from '../entities/paginated/goodDealPaginated'
-
-export enum FindOptionsOrderValue {
-  ASC = 'ASC',
-  DESC = 'DESC',
-}
-
-registerEnumType(FindOptionsOrderValue, {
-  name: 'FindOptionsOrderValue',
-})
+import { FindOptionsOrderValue } from '../interfaces/general/paginated/findOptionsOrderEnum'
 
 @ObjectType()
 class GoodDealWithTotal extends GoodDeal {

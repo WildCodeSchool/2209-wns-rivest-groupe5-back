@@ -13,27 +13,59 @@ import { Following } from '../entities/userIsFollowing'
 import { getDateXDaysAgo } from '../utils/dates/datesUtils'
 import { IObj } from '../interfaces/general/IObject'
 import { userVisibility } from '../interfaces/entities/UserVisibilityOptions'
+import { ActivityPaginatedResult } from '../entities/paginated/activityPaginated'
+import { FindOptionsOrderValue } from '../interfaces/general/paginated/findOptionsOrderEnum'
+import { IActivity } from '../interfaces/entities/IActivity'
 
 @Resolver(Activity)
 export class ActivityResolver {
   @Authorized()
-  @Query(() => [Activity])
-  async getAllMyActivities(@Ctx() ctx: Context): Promise<Activity[]> {
+  @Query(() => ActivityPaginatedResult)
+  async getAllMyActivities(
+    @Ctx() ctx: Context,
+    @Arg('page', { nullable: true }) page: number = 1,
+    @Arg('pageSize', { nullable: true }) pageSize: number = 10
+  ): Promise<ActivityPaginatedResult> {
     const userFromCtx = ctx as IUserCtx
 
-    const allActivities = await dataSource.getRepository(Activity).find({
-      relations: {
-        activityType: true,
-        user: true,
-      },
-      where: {
-        user: {
-          userId: userFromCtx.user.userId,
+    const offset = (page - 1) * pageSize
+
+    const [data, total] = await Promise.all([
+      dataSource.getRepository(Activity).find({
+        relations: {
+          activityType: true,
+          user: true,
         },
-      },
+        where: {
+          user: {
+            userId: userFromCtx.user.userId,
+          },
+        },
+        skip: offset,
+        take: pageSize,
+      }),
+      dataSource.getRepository(Activity).count({
+        where: {
+          user: {
+            userId: userFromCtx.user.userId,
+          },
+        },
+      }),
+    ])
+
+    data.sort((a, b) => {
+      return b.createdAt.getTime() - a.createdAt.getTime()
     })
 
-    return allActivities
+    const totalPages = Math.ceil(total / pageSize)
+
+    return {
+      data,
+      total,
+      currentPage: page,
+      pageSize,
+      totalPages,
+    }
   }
 
   @Authorized()
@@ -174,10 +206,12 @@ export class ActivityResolver {
   }
 
   @Authorized()
-  @Query(() => [Activity])
+  @Query(() => ActivityPaginatedResult)
   async getAllUsersFollowedLastSevenDaysActivities(
-    @Ctx() ctx: Context
-  ): Promise<Activity[]> {
+    @Ctx() ctx: Context,
+    @Arg('page', { nullable: true }) page: number = 1,
+    @Arg('pageSize', { nullable: true }) pageSize: number = 10
+  ): Promise<ActivityPaginatedResult> {
     const userFromCtx = ctx as IUserCtx
 
     const followedUsers = await dataSource.getRepository(Following).find({
@@ -186,11 +220,12 @@ export class ActivityResolver {
         userFollowed: true,
       },
     })
+    const targetDate = getDateXDaysAgo(7)
+
     const followedUserIds = followedUsers.map(
       (follow: IObj) => follow.userFollowed
     )
 
-    const targetDate = getDateXDaysAgo(7)
     let allUsersActivities: Activity[] = []
 
     for await (const userId of followedUserIds) {
@@ -207,30 +242,36 @@ export class ActivityResolver {
             },
             createdAt: MoreThan(targetDate),
           },
-          select: {
-            user: {
-              userId: true,
-              firstname: true,
-              lastname: true,
-              email: true,
-              avatar: true,
-            },
+          order: {
+            createdAt: 'DESC',
           },
+          take: 10, // Obtenez les 10 dernières activités pour chaque utilisateur
         })
 
       allUsersActivities = allUsersActivities.concat(userLastActivities)
     }
 
-    // order all activities from most recent to oldest
+    // Triez toutes les activités par ordre chronologique décroissant
     allUsersActivities.sort(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
     )
 
-    return allUsersActivities
+    // Effectuez la pagination en utilisant les paramètres page et pageSize
+    const startIndex = (page - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    const paginatedActivities = allUsersActivities.slice(startIndex, endIndex)
+
+    return {
+      data: paginatedActivities,
+      currentPage: page,
+      pageSize,
+      total: allUsersActivities.length,
+      totalPages: Math.ceil(allUsersActivities.length / pageSize),
+    }
   }
 
   @Query(() => [Activity])
-  async getPublicOrFollowedUserLastSevenDaysActivities(
+  async getPublicOrFollowedUserLastFiveActivities(
     @Ctx() ctx: Context,
     @Arg('userId') userId: number
   ): Promise<Activity[]> {
@@ -257,38 +298,31 @@ export class ActivityResolver {
       throw new Error("Cannot access unfollowed private user's data")
     }
 
-    // target user is private
-    const targetDate = getDateXDaysAgo(7)
-
-    const userLastActivities: Activity[] = await dataSource
-      .getRepository(Activity)
-      .find({
-        relations: {
-          activityType: true,
-          user: true,
+    const data = await dataSource.getRepository(Activity).find({
+      relations: {
+        activityType: true,
+        user: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      where: {
+        user: {
+          userId: userId,
         },
-        where: {
-          user: {
-            userId: userId,
-          },
-          createdAt: MoreThan(targetDate),
+      },
+      select: {
+        user: {
+          userId: true,
+          firstname: true,
+          lastname: true,
+          email: true,
+          avatar: true,
         },
-        select: {
-          user: {
-            userId: true,
-            firstname: true,
-            lastname: true,
-            email: true,
-            avatar: true,
-          },
-        },
-      })
+      },
+      take: 5,
+    })
 
-    // order all activities from most recent to oldest
-    userLastActivities.sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-    )
-
-    return userLastActivities
+    return data
   }
 }
