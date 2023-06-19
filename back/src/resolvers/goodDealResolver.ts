@@ -101,23 +101,58 @@ export class GoodDealResolver {
   }
 
   @Authorized()
-  @Query(() => [GoodDeal])
-  async getAllMyGoodDeals(@Ctx() ctx: Context): Promise<GoodDeal[]> {
+  @Query(() => GoodDealPaginatedResult)
+  async getAllMyGoodDeals(
+    @Ctx() ctx: Context,
+    @Arg('page', { nullable: true }) page: number = 1,
+    @Arg('pageSize', { nullable: true }) pageSize: number = 10,
+    @Arg('order', () => FindOptionsOrderValue, {
+      nullable: true,
+      defaultValue: undefined,
+    })
+    order: FindOptionsOrderValue = FindOptionsOrderValue.ASC
+  ): Promise<GoodDealPaginatedResult> {
     const userFromCtx = ctx as IUserCtx
 
-    const allGoodDeals = await dataSource.getRepository(GoodDeal).find({
-      relations: {
-        goodDealVotes: { user: true },
-        user: true,
-      },
-      where: {
-        user: {
-          userId: userFromCtx.user.userId,
-        },
-      },
-    })
+    const offset = (page - 1) * pageSize
 
-    return allGoodDeals
+    const [data, total] = await Promise.all([
+      dataSource.getRepository(GoodDeal).find({
+        order: {
+          goodDealId: order,
+        },
+        relations: {
+          goodDealVotes: {
+            user: true,
+          },
+          user: true,
+        },
+        where: {
+          user: {
+            userId: userFromCtx.user.userId,
+          },
+        },
+        skip: offset,
+        take: pageSize,
+      }),
+      dataSource.getRepository(GoodDeal).count({
+        where: {
+          user: {
+            userId: userFromCtx.user.userId,
+          },
+        },
+      }),
+    ])
+
+    const totalPages = Math.ceil(total / pageSize)
+
+    return {
+      data,
+      total,
+      currentPage: page,
+      pageSize,
+      totalPages,
+    }
   }
 
   @Authorized()
