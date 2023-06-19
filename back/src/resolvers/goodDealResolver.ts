@@ -16,6 +16,7 @@ import { IUserCtx } from '../interfaces/general/IUserCtx'
 import dataSource from '../utils/datasource'
 import { CreateGoodDealInput } from './inputs/createGoodDealInput'
 import { USER_ROLES } from '../utils/userRoles'
+import { GoodDealPaginatedResult } from '../entities/paginated/goodDealPaginated'
 
 export enum FindOptionsOrderValue {
   ASC = 'ASC',
@@ -34,30 +35,44 @@ class GoodDealWithTotal extends GoodDeal {
 
 @Resolver(GoodDeal)
 export class GoodDealResolver {
-  @Query(() => [GoodDeal])
+  @Query(() => GoodDealPaginatedResult)
   async getAllGoodDeals(
-    @Arg('limit', { nullable: true, defaultValue: undefined })
-    limit: number = 0,
+    @Arg('page', { nullable: true }) page: number = 1,
+    @Arg('pageSize', { nullable: true }) pageSize: number = 10,
     @Arg('order', () => FindOptionsOrderValue, {
       nullable: true,
       defaultValue: undefined,
     })
     order: FindOptionsOrderValue = FindOptionsOrderValue.ASC
-  ): Promise<GoodDeal[]> {
-    const allGoodDeals = await dataSource.getRepository(GoodDeal).find({
-      order: {
-        goodDealId: order,
-      },
-      relations: {
-        goodDealVotes: {
+  ): Promise<GoodDealPaginatedResult> {
+    const offset = (page - 1) * pageSize
+
+    const [data, total] = await Promise.all([
+      dataSource.getRepository(GoodDeal).find({
+        order: {
+          goodDealId: order,
+        },
+        relations: {
+          goodDealVotes: {
+            user: true,
+          },
           user: true,
         },
-        user: true,
-      },
-      take: limit,
-    })
+        skip: offset,
+        take: pageSize,
+      }),
+      dataSource.getRepository(GoodDeal).count(),
+    ])
 
-    return allGoodDeals
+    const totalPages = Math.ceil(total / pageSize)
+
+    return {
+      data,
+      total,
+      currentPage: page,
+      pageSize,
+      totalPages,
+    }
   }
 
   @Query(() => GoodDealWithTotal)
