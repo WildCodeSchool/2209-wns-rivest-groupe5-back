@@ -9,6 +9,9 @@ export class CreateGoodDealInput {
   goodDealContent: string
 
   @Field(() => String, { nullable: true })
+  goodDealDescription?: string
+
+  @Field(() => String, { nullable: true })
   goodDealLink?: string
 
   @Field(() => String, { nullable: true })

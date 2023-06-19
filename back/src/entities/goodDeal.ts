@@ -31,6 +31,10 @@ export class GoodDeal implements IGoodDeal {
   @Column()
   goodDealContent: string
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  goodDealDescription?: string
+
   @Field(() => [GoodDealVote], { nullable: true })
   @OneToMany(() => GoodDealVote, (goodDealVote) => goodDealVote.goodDeal, {
     cascade: true,
