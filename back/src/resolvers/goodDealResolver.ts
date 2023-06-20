@@ -17,6 +17,7 @@ import { CreateGoodDealInput } from './inputs/createGoodDealInput'
 import { USER_ROLES } from '../utils/userRoles'
 import { GoodDealPaginatedResult } from '../entities/paginated/goodDealPaginated'
 import { FindOptionsOrderValue } from '../interfaces/general/paginated/findOptionsOrderEnum'
+import { UpdateGoodDealInput } from './inputs/updateGoodDealInput'
 
 @ObjectType()
 class GoodDealWithTotal extends GoodDeal {
@@ -194,5 +195,60 @@ export class GoodDealResolver {
     await dataSource.getRepository(GoodDeal).remove(goodDeal)
 
     return 'Good Deal Deleted Successfully.'
+  }
+
+  @Authorized()
+  @Mutation(() => GoodDeal)
+  async updateGoodDeal(
+    @Ctx() ctx: Context,
+    @Arg('goodDealId') goodDealId: number,
+    @Arg('data') updateGoodDeal: UpdateGoodDealInput
+  ): Promise<GoodDeal> {
+    const userFromCtx = ctx as IUserCtx
+
+    const goodDealFromDb = await dataSource.manager.find(GoodDeal, {
+      where: {
+        goodDealId: goodDealId,
+      },
+      relations: {
+        user: true,
+      },
+    })
+
+    if (goodDealFromDb === undefined || goodDealFromDb[0] === undefined) {
+      throw new Error('No good deal found with this goodDealId')
+    }
+
+    if (
+      userFromCtx.user.userId !== goodDealFromDb[0].user.userId &&
+      userFromCtx.user.role !== USER_ROLES.ADMIN
+    ) {
+      // if user requesting is not the author of the goodDeal to update and is not admin, throw error
+      throw new Error(
+        'The user trying to update the good deal is not the good deal creator and is not an admin. This action is forbidden.'
+      )
+    }
+
+    const updatedGoodDeal = await dataSource.getRepository(GoodDeal).update(
+      { goodDealId: goodDealId },
+      {
+        goodDealTitle: updateGoodDeal.goodDealTitle,
+        goodDealLink: updateGoodDeal.goodDealLink,
+        goodDealContent: updateGoodDeal.goodDealContent,
+        goodDealDescription: updateGoodDeal.goodDealDescription,
+        image: updateGoodDeal.image,
+      }
+    )
+
+    if (updatedGoodDeal.affected === 0) {
+      throw new Error('Could not update the Good Deal.')
+    }
+
+    // find again goodDeal to get the updated version
+    const goodDeal = await dataSource
+      .getRepository(GoodDeal)
+      .findOneByOrFail({ goodDealId })
+
+    return goodDeal
   }
 }

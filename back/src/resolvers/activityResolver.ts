@@ -14,8 +14,6 @@ import { getDateXDaysAgo } from '../utils/dates/datesUtils'
 import { IObj } from '../interfaces/general/IObject'
 import { userVisibility } from '../interfaces/entities/UserVisibilityOptions'
 import { ActivityPaginatedResult } from '../entities/paginated/activityPaginated'
-import { FindOptionsOrderValue } from '../interfaces/general/paginated/findOptionsOrderEnum'
-import { IActivity } from '../interfaces/entities/IActivity'
 
 @Resolver(Activity)
 export class ActivityResolver {
@@ -184,7 +182,7 @@ export class ActivityResolver {
     })
 
     if (activityFromDb === undefined || activityFromDb[0] === undefined) {
-      throw new Error('Not activity found with this activityId')
+      throw new Error('No activity found with this activityId')
     }
 
     if (userFromCtx.user.userId !== activityFromDb[0].user.userId) {
