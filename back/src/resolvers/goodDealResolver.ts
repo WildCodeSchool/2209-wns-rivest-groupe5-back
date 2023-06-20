@@ -8,7 +8,6 @@ import {
   ObjectType,
   Query,
   Resolver,
-  registerEnumType,
 } from 'type-graphql'
 import { GoodDeal } from '../entities/goodDeal'
 import { User } from '../entities/user'
@@ -16,15 +15,8 @@ import { IUserCtx } from '../interfaces/general/IUserCtx'
 import dataSource from '../utils/datasource'
 import { CreateGoodDealInput } from './inputs/createGoodDealInput'
 import { USER_ROLES } from '../utils/userRoles'
-
-export enum FindOptionsOrderValue {
-  ASC = 'ASC',
-  DESC = 'DESC',
-}
-
-registerEnumType(FindOptionsOrderValue, {
-  name: 'FindOptionsOrderValue',
-})
+import { GoodDealPaginatedResult } from '../entities/paginated/goodDealPaginated'
+import { FindOptionsOrderValue } from '../interfaces/general/paginated/findOptionsOrderEnum'
 
 @ObjectType()
 class GoodDealWithTotal extends GoodDeal {
@@ -34,30 +26,44 @@ class GoodDealWithTotal extends GoodDeal {
 
 @Resolver(GoodDeal)
 export class GoodDealResolver {
-  @Query(() => [GoodDeal])
+  @Query(() => GoodDealPaginatedResult)
   async getAllGoodDeals(
-    @Arg('limit', { nullable: true, defaultValue: undefined })
-    limit: number = 0,
+    @Arg('page', { nullable: true }) page: number = 1,
+    @Arg('pageSize', { nullable: true }) pageSize: number = 10,
     @Arg('order', () => FindOptionsOrderValue, {
       nullable: true,
       defaultValue: undefined,
     })
     order: FindOptionsOrderValue = FindOptionsOrderValue.ASC
-  ): Promise<GoodDeal[]> {
-    const allGoodDeals = await dataSource.getRepository(GoodDeal).find({
-      order: {
-        goodDealId: order,
-      },
-      relations: {
-        goodDealVotes: {
+  ): Promise<GoodDealPaginatedResult> {
+    const offset = (page - 1) * pageSize
+
+    const [data, total] = await Promise.all([
+      dataSource.getRepository(GoodDeal).find({
+        order: {
+          goodDealId: order,
+        },
+        relations: {
+          goodDealVotes: {
+            user: true,
+          },
           user: true,
         },
-        user: true,
-      },
-      take: limit,
-    })
+        skip: offset,
+        take: pageSize,
+      }),
+      dataSource.getRepository(GoodDeal).count(),
+    ])
 
-    return allGoodDeals
+    const totalPages = Math.ceil(total / pageSize)
+
+    return {
+      data,
+      total,
+      currentPage: page,
+      pageSize,
+      totalPages,
+    }
   }
 
   @Query(() => GoodDealWithTotal)
@@ -86,23 +92,58 @@ export class GoodDealResolver {
   }
 
   @Authorized()
-  @Query(() => [GoodDeal])
-  async getAllMyGoodDeals(@Ctx() ctx: Context): Promise<GoodDeal[]> {
+  @Query(() => GoodDealPaginatedResult)
+  async getAllMyGoodDeals(
+    @Ctx() ctx: Context,
+    @Arg('page', { nullable: true }) page: number = 1,
+    @Arg('pageSize', { nullable: true }) pageSize: number = 10,
+    @Arg('order', () => FindOptionsOrderValue, {
+      nullable: true,
+      defaultValue: undefined,
+    })
+    order: FindOptionsOrderValue = FindOptionsOrderValue.ASC
+  ): Promise<GoodDealPaginatedResult> {
     const userFromCtx = ctx as IUserCtx
 
-    const allGoodDeals = await dataSource.getRepository(GoodDeal).find({
-      relations: {
-        goodDealVotes: { user: true },
-        user: true,
-      },
-      where: {
-        user: {
-          userId: userFromCtx.user.userId,
-        },
-      },
-    })
+    const offset = (page - 1) * pageSize
 
-    return allGoodDeals
+    const [data, total] = await Promise.all([
+      dataSource.getRepository(GoodDeal).find({
+        order: {
+          goodDealId: order,
+        },
+        relations: {
+          goodDealVotes: {
+            user: true,
+          },
+          user: true,
+        },
+        where: {
+          user: {
+            userId: userFromCtx.user.userId,
+          },
+        },
+        skip: offset,
+        take: pageSize,
+      }),
+      dataSource.getRepository(GoodDeal).count({
+        where: {
+          user: {
+            userId: userFromCtx.user.userId,
+          },
+        },
+      }),
+    ])
+
+    const totalPages = Math.ceil(total / pageSize)
+
+    return {
+      data,
+      total,
+      currentPage: page,
+      pageSize,
+      totalPages,
+    }
   }
 
   @Authorized()

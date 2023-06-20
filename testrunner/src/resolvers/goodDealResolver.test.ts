@@ -12,6 +12,7 @@ describe('Activity resolver', () => {
       query: GET_ALL_GOOD_DEALS,
       fetchPolicy: 'no-cache',
     })
-    expect(res.data?.getAllGoodDeals).toEqual([])
+    expect(res.data?.getAllGoodDeals).toHaveProperty('data')
+    expect(Array.isArray(res.data?.getAllGoodDeals.data)).toEqual(true)
   })
 })
