@@ -67,6 +67,26 @@ export class ActivityResolver {
   }
 
   @Authorized()
+  @Query(() => Activity)
+  async getActivityById(
+    @Ctx() ctx: Context,
+    @Arg('activityId') activityId: number
+  ): Promise<Activity> {
+    const userFromCtx = ctx as IUserCtx
+
+    const activityFromDb = await dataSource
+      .getRepository(Activity)
+      .findOneByOrFail({
+        activityId,
+        user: {
+          userId: userFromCtx.user.userId,
+        },
+      })
+
+    return activityFromDb
+  }
+
+  @Authorized()
   @Mutation(() => Activity)
   async createActivity(
     @Ctx() ctx: Context,
