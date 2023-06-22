@@ -12,7 +12,7 @@ describe('ActivityType resolver', () => {
 
   beforeAll(async () => {
     testAdmin = await generateTestAdmin()
-    testAdminToken = await getTokenForUser('test', testAdmin.email)
+    testAdminToken = await getTokenForUser('ABcd1234*', testAdmin.email)
   })
 
   afterAll(async () => {
