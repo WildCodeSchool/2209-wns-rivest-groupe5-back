@@ -74,16 +74,24 @@ export class ActivityResolver {
   ): Promise<Activity> {
     const userFromCtx = ctx as IUserCtx
 
-    const activityFromDb = await dataSource
-      .getRepository(Activity)
-      .findOneByOrFail({
+    const activityFromDb = await dataSource.getRepository(Activity).find({
+      relations: {
+        activityType: true,
+        user: true,
+      },
+      where: {
         activityId,
         user: {
           userId: userFromCtx.user.userId,
         },
-      })
+      },
+    })
 
-    return activityFromDb
+    if (!activityFromDb || activityFromDb.length === 0) {
+      throw new Error('Aucune activité trouvée.')
+    }
+
+    return activityFromDb[0]
   }
 
   @Authorized()
