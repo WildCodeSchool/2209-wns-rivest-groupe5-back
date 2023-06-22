@@ -54,6 +54,10 @@ export class UserResolver {
     const getUserdata: User = await dataSource
       .getRepository(User)
       .findOneByOrFail({ userId })
+    console.log(
+      '🚀 ~ file: userResolver.ts:57 ~ UserResolver ~ getUserdata:',
+      getUserdata
+    )
 
     if (getUserdata.visibility === userVisibility.private) {
       const userFromCtx = ctx as IUserCtx

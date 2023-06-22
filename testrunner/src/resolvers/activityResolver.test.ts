@@ -30,11 +30,11 @@ describe('Activity resolver', () => {
 
   beforeAll(async () => {
     testUser = await generateTestUser()
-    testUserToken = await getTokenForUser('test', testUser.email)
+    testUserToken = await getTokenForUser('ABcd1234*', testUser.email)
     testUser2 = await generateTestUser()
-    testUserToken2 = await getTokenForUser('test', testUser2.email)
+    testUserToken2 = await getTokenForUser('ABcd1234*', testUser2.email)
     testAdmin = await generateTestAdmin()
-    testAdminToken = await getTokenForUser('test', testAdmin.email)
+    testAdminToken = await getTokenForUser('ABcd1234*', testAdmin.email)
 
     testActivityType = await generateTestActivityType(
       testActivityTypeName,
