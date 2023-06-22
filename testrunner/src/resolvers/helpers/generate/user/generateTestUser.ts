@@ -7,10 +7,10 @@ export const generateTestUser = async (): Promise<ITestUser> => {
     mutation: CREATE_USER,
     variables: {
       email: `test${Math.floor(Math.random() * 1000000)}@test.com`,
-      password: 'test',
+      password: 'ABcd1234*',
       firstname: 'testfirst',
       lastname: 'testlast',
-      avatar:'avatarTest'
+      avatar: 'avatarTest',
     },
     fetchPolicy: 'no-cache',
   })

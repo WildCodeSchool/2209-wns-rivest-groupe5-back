@@ -224,6 +224,10 @@ export class UserResolver {
       )
     }
 
+    if (!isValidPassword(password)) {
+      throw new Error('Invalid password format')
+    }
+
     requestingUser.password = await argon2.hash(password.trim())
     requestingUser.passwordResetToken = ''
     requestingUser.passwordResetExpires = new Date(0)
@@ -251,7 +255,7 @@ export class UserResolver {
     @Arg('avatar') avatar?: string
   ): Promise<User> {
     if (!isValidEmail(email) || !isValidPassword(password)) {
-      throw new Error('Invalid email or password')
+      throw new Error('Invalid email or password format')
     }
 
     const newUser = new User()
