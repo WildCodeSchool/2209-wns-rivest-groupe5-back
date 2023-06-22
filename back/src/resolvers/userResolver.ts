@@ -22,6 +22,7 @@ import { userVisibility } from '../interfaces/entities/UserVisibilityOptions'
 import { Following } from '../entities/userIsFollowing'
 import { IUser } from '../interfaces/entities/IUser'
 import { ILike, getRepository, SelectQueryBuilder } from 'typeorm'
+import { isValidEmail, isValidPassword } from '../utils/regex'
 
 @ObjectType()
 class LoginResponse {
@@ -249,6 +250,10 @@ export class UserResolver {
     @Arg('lastname') lastname: string,
     @Arg('avatar') avatar?: string
   ): Promise<User> {
+    if (!isValidEmail(email) || !isValidPassword(password)) {
+      throw new Error('Invalid email or password')
+    }
+
     const newUser = new User()
     newUser.email = email.toLowerCase().trim()
     newUser.firstname = firstname
