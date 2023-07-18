@@ -6,6 +6,11 @@ import { GoodDealVote } from '../entities/goodDealVote'
 import { User } from '../entities/user'
 import { Following } from '../entities/userIsFollowing'
 
+// console.log(
+//   '########## process.env.TYPEORM_MIGRATION',
+//   process.env.TYPEORM_MIGRATION
+// )
+
 const dataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB || 'db',
@@ -14,8 +19,8 @@ const dataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD || 'azerty',
   database: 'postgres',
   synchronize: true,
-  entities: [User, Activity, ActivityType, GoodDeal, GoodDealVote, Following],
-  migrations: ['src/migrations/*.ts'],
+  entities: [Activity, ActivityType, GoodDeal, GoodDealVote, User, Following],
+  migrations: [process.env.TYPEORM_MIGRATION!], // base: "src/migrations/*.ts"
   // logging: ["query", "error"],
 })
 

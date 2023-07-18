@@ -17,7 +17,12 @@ import { GetStatsResolver } from './resolvers/getStatsResolver'
 import { FollowingResolver } from './resolvers/followingResolver'
 import { PopulateInitDb } from './migrations/PopulateInitDb'
 
-dotenv.config()
+dotenv.config({
+  path:
+    process.env.NODE_ENV === 'development'
+      ? '../.env.dev'
+      : '../.env.production',
+})
 
 const port = 5050
 
