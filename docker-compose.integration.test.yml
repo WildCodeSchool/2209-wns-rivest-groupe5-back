@@ -40,7 +40,7 @@ services:
     volumes:
       - ./back/src/:/app/src/
     healthcheck:
-      test: 'curl --fail --request POST --header ''content-type: application/json'' --url ''http://localhost:5050'' --data ''{"query":"query { __typename }"}'' || exit 1'
+      test: 'curl --fail --request POST --header "Content-Type: application/json" --data ''{"query":"{ __schema { types { name } } }"}'' http://localhost:5050 || exit 1'
       interval: 2s
       timeout: 60s
       retries: 30
