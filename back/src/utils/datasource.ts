@@ -6,10 +6,10 @@ import { GoodDealVote } from '../entities/goodDealVote'
 import { User } from '../entities/user'
 import { Following } from '../entities/userIsFollowing'
 
-console.log(
-  '########## process.env.TYPEORM_MIGRATION',
-  process.env.TYPEORM_MIGRATION
-)
+// console.log(
+//   '########## process.env.TYPEORM_MIGRATION',
+//   process.env.TYPEORM_MIGRATION
+// )
 
 const dataSource = new DataSource({
   type: 'postgres',
