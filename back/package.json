@@ -4,9 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=development ts-node-dev --files -r dotenv/config --poll src/index.ts",
+    "dev": "ts-node-dev --files -r dotenv/config --poll src/index.ts",
     "build": "tsc",
-    "start": "NODE_ENV=production node -r dotenv/config build/index.js",
+    "start": "node -r dotenv/config build/index.js",
     "typeorm": "typeorm-ts-node-esm"
   },
   "description": "",
