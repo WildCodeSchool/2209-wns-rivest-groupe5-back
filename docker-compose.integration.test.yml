@@ -42,8 +42,8 @@ services:
     healthcheck:
       test: 'curl --fail --request POST --header ''content-type: application/json'' --url ''http://localhost:5050'' --data ''{"query":"query { __typename }"}'' || exit 1'
       interval: 2s
-      timeout: 16s
-      retries: 8
+      timeout: 60s
+      retries: 30
       start_period: 2s
 
   mailhog:
