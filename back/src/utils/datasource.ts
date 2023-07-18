@@ -14,8 +14,8 @@ const dataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD || 'azerty',
   database: 'postgres',
   synchronize: true,
-  entities: [User, Activity, ActivityType, GoodDeal, GoodDealVote, Following],
-  migrations: ['src/migrations/*.ts'],
+  entities: [Activity, ActivityType, GoodDeal, GoodDealVote, User, Following],
+  migrations: [process.env.TYPEORM_MIGRATION!], // base: "src/migrations/*.ts"
   // logging: ["query", "error"],
 })
 
