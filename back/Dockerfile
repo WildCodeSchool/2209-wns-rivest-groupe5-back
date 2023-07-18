@@ -12,6 +12,7 @@ RUN npm ci
 
 COPY tsconfig.json ./
 COPY src src
+COPY .env ./
 
 # Étape de production
 FROM node:lts-alpine
