@@ -17,7 +17,7 @@ jobs:
           cd back/
           touch .env
           echo "JWT_SECRET_KEY=qkdjfhqiudfhviusdfhgiousdhfsuhfgiuosdhfoiudshfog
-          POSTGRES_PASSWORD=test"  >> .env
+          POSTGRES_PASSWORD=test123"  >> .env
 
       - name: Goto back and run tests
         run: docker compose -f docker-compose.integration.test.yml up --build --exit-code-from testrunner
