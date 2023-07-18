@@ -15,7 +15,7 @@ import { DeleteAllEntitiesResolver } from './resolvers/testResolver'
 import { GoodDealVoteResolver } from './resolvers/goodDealVoteResolver'
 import { GetStatsResolver } from './resolvers/getStatsResolver'
 import { FollowingResolver } from './resolvers/followingResolver'
-import { PopulateInitDb } from './migrations/populateInitDb'
+import { PopulateInitDb } from './migrations/PopulateInitDb'
 
 dotenv.config({
   path:
