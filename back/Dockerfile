@@ -1,10 +1,6 @@
 # Étape de construction
 FROM node:lts-alpine AS builder
 
-RUN apk --no-cache add curl
-RUN apk add make g++ python3 git
-RUN npm i -g node-pre-gyp
-
 WORKDIR /app
 
 COPY package*.json ./
@@ -16,6 +12,9 @@ COPY .env ./
 
 # Étape de production
 FROM node:lts-alpine
+
+RUN apk --no-cache add curl make g++ python3 git && \
+    npm i -g node-pre-gyp 
 
 WORKDIR /app
 
