@@ -26,7 +26,9 @@ export class GoodDealVote implements IGoodDealVote {
   createdAt: Date
 
   @Field(() => GoodDeal)
-  @ManyToOne(() => GoodDeal, (goodDeal) => goodDeal.goodDealVotes)
+  @ManyToOne(() => GoodDeal, (goodDeal) => goodDeal.goodDealVotes, {
+    onDelete: 'CASCADE',
+  })
   goodDeal: GoodDeal
 
   @Field(() => User, { nullable: false })
